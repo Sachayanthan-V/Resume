@@ -1445,10 +1445,34 @@ textarea.input-field {
   min-width: 70px;
 }
 
-#education ,.education{
+#education {
   padding: 100px 30px;
 }
+@media (min-width: 992px) {
 
-.section-subtitle-education {
-  top: 105px;
+  .section-subtitle-education {
+    top: 105px;
+  }
+  
+}
+
+@media (min-width : 550px) and (max-width: 992px) {
+  #education {
+    width: 130%;
+  }
+}
+
+.coding-ninja-logo {
+  max-width: 300px;
+}
+
+.section-title p {
+  margin-top: 5px;
+  font-size: 13px;
+}
+
+.section-heading-straight {
+  color: var(--color-primary);
+  margin-left: 50px;
+  font-size: 30px;
 }
