@@ -754,7 +754,7 @@ main { overflow-x: hidden; }
 }
 
 
-.contact, .education { padding-block: var(--section-padding); }
+.contact { padding-block: var(--section-padding); }
 
 .contact-content, .education-content { margin-bottom: 50px; }
 
@@ -1355,33 +1355,100 @@ textarea.input-field {
 
 }
 
-/* figure {
 
-  max-width: 600px !important;
-  max-height: 600px !important;
-  animation: alternate 4s heroBorder infinite;
-  overflow: hidden;
-  background-image: url('./../images/Hero_Banner_Corrected-rp.png');
-  background-repeat: no-repeat;
-  background-size: contain;
+
+#education img {
+  max-width: 50px;
+  max-height: 50px;
 }
 
-@keyframes heroBorder {
 
-  20%  {
-    border-radius: 30% 70% 70% 30% / 38% 30% 70% 62% ; 
-  }
-  40%  {
-    border-radius: 70% 30% 76% 24% / 28% 41% 59% 72% ;
-  }
-  60%  {
-    border-radius: 73% 27% 76% 24% / 64% 41% 59% 36% ;
-  }
-  80%  {
-    border-radius: 12% 88% 55% 45% / 64% 41% 59% 36%  ;
-  }
-  100% {
-    border-radius: 48% 52% 50% 50% / 38% 54% 46% 62% ;
-    border-radius: 30% 70% 70% 30% / 38% 30% 70% 62%;
-  }
-} */
+#education-cover {
+
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  /* justify-content: space-around; */
+  align-items: center;
+  /* border: 2px solid orange; */
+  padding: 5px;
+
+}
+
+
+#education .educate-card {
+  margin: 10px;
+  min-width: 200px;
+  max-width: 300px;
+  min-height: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+  padding: 5px;
+  box-shadow: var(--shadow-1);
+  background-color: var(--bg-secondary);
+}
+
+#education span {
+  color: var(--color-primary);
+  font-weight: 600;
+  text-align: end;
+  margin-right: 10px;
+  /* background: var(--raw-seinna);
+  padding: 5px;
+  border-radius: 3px; */
+}
+
+.logo-education {
+  display: flex;
+  margin-top: 2px;
+  margin-bottom: 2px;
+  flex-direction: row;
+  justify-content: space-around;
+  /* border: 1px solid green; */
+  width: 100%;
+}
+
+.logo-education img, .logo-education h2 {
+  margin: 6px 10px;
+}
+
+.logo-education h2 {
+  font-weight: 600;
+  font-size: 1.3rem;
+  color: var(--color-primary);
+
+}
+
+
+.text-educational-details {
+  color: var(--color-secondary);
+}
+
+.education-details {
+  margin-top: 10px;
+  width: 100%;
+  min-height: 170px;
+}
+
+.education-details > div {
+  width: 100%;
+  display: flex;
+  margin: 10px 2px;
+  color: var(--color-primary);
+}
+
+.education-details > div span {
+  min-width: 70px;
+}
+
+#education ,.education{
+  padding: 100px 30px;
+}
+
+.section-subtitle-education {
+  top: 105px;
+}
