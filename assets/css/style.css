@@ -1147,7 +1147,7 @@ textarea.input-field {
     height: 100%;
     width: auto;
     margin-inline: auto;
-    border-radius: 30% 70% 70% 30% / 38% 30% 70% 62% ;
+    /* border-radius: 30% 70% 70% 30% / 38% 30% 70% 62% ; */
   } 
 
   .hero-content {
@@ -1475,4 +1475,20 @@ textarea.input-field {
   color: var(--color-primary);
   margin-left: 50px;
   font-size: 30px;
+}
+
+
+
+@media (max-width : 450px) {
+    
+  .logo a{
+    font-size: 25px;
+  }
+}
+
+@media (max-width : 370px) {
+    
+  .logo a{
+    font-size: 20px;
+  }
 }
