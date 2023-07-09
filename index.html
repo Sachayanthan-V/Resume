@@ -169,10 +169,6 @@
 
       </section>
 
-
-
-
-
       <!-- 
         - #STATS
       -->
@@ -231,7 +227,6 @@
         </ul>
       </section>
 
-
       <!-- 
         - #ABOUT
       -->
@@ -259,14 +254,13 @@
           <div class="btn-group">
 
             <a href="#contact" class="btn btn-secondary">Hire me</a>  
-            <a class="btn btn-primary" href = "./assets/folder/SachayanthanResumeMarch2023.pdf" download = "Sachayanthan-V-Resume">Download CV</a>
+            <a class="btn btn-primary" href = "./assets/files/pdf/SachayanthanResumeMarch2023.pdf" download = "Sachayanthan-V-Resume">Download CV</a>
             
           </div>
 
         </div>
 
       </section>
-
 
       <!-- 
         - #SKILLS
@@ -648,7 +642,6 @@
 
       </section>
 
-
       <!--  
         #EDUCATIONAL QUALIFICATION
       -->   
@@ -830,7 +823,6 @@
 
       </section>
 
-
       
       <section class="about experience" id="work-experience">
 
@@ -868,11 +860,9 @@
 
       </section>
 
-
       <!-- 
         - #PROJECTS
       -->
-
       
       <section class="project" id="portfolio">
 
@@ -1126,7 +1116,7 @@
 
         </div>
 
-        <form action="https://formsubmit.co/08f8a6a167f7eeeff248bd053ed0b618" method="POST" class="contact-form">
+        <form name="submit-to-google-sheet" class="contact-form">
 
           <div class="form-wrapper">
 
@@ -1186,13 +1176,7 @@
 
           </div>
 
-          <input type="hidden" name="_next" value="http://127.0.0.1:5500/assets/html/thanks.html">
-          <input type="hidden" name="_subject" value="MyResume New Response">
-          <input type="hidden" name="_captcha" value="false">
-          <!-- <input type="hidden" name="_autoresponse" value="Thank you for contacting me, I will contact you soon!. its an auto-response mail  <br><br>Thanks & Regards, <br> Sachayanthan V"> -->
-          <input type="hidden" name="_template" value="table">
-
-          <button type="submit" class="btn btn-primary">Send</button>
+          <button type="submit" id="form-submit-btn" class="btn btn-primary">Send</button>
 
         </form>
 
@@ -1200,9 +1184,6 @@
 
     </article>
   </main>
-
-
-
 
 
   <!-- 
@@ -1225,7 +1206,6 @@
     </div>
   </footer>
 
-
   <!-- 
     - #GO TO TOP
   -->
@@ -1233,7 +1213,6 @@
   <a href="#top" class="go-top" data-go-top title="Go to Top">
     <ion-icon name="arrow-up"></ion-icon>
   </a>
-
 
   <!-- 
     - custom js link
@@ -1245,6 +1224,35 @@
   -->
   <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
   <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+
+  <script>
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbxDIfnbe_PU5IcklxujCJmyCL0W8yBYEMXT2stGVC2zcc6W1KxJJ2wuSrdSqOnck23e/exec'
+    const form = document.forms['submit-to-google-sheet']
+
+    const name    = document.getElementById('name');
+    const email   = document.getElementById('email');
+    const phone   = document.getElementById('phone');
+    const message = document.getElementById('message');
+    const SubmitBtn = document.getElementById('form-submit-btn');
+  
+    form.addEventListener('submit', e => {
+      e.preventDefault()
+      fetch(scriptURL, { method: 'POST', body: new FormData(form)})
+        .then( (response) =>{
+
+          SubmitBtn.innerHTML = "Message Sent Successfully!." ;
+
+          setTimeout(function(){
+            SubmitBtn.innerHTML = "Send" ;
+          }, 5000);
+
+          form.reset();
+          console.log(`Message sent successfully!...`);
+
+        })
+        .catch(error => console.error('Error!', error.message))
+    })
+  </script>
 
 </body>
 

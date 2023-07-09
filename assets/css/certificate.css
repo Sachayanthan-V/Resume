@@ -1,0 +1,68 @@
+#certifications {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+}
+
+#certifications #certificate-card {
+    
+    width: 30rem;
+    border-radius: 10px;
+    background-color: #2f2f2f;
+    padding: 10px;
+    color: white;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    overflow: hidden !important;
+    margin-bottom: 10px;
+    
+}
+
+#certifications #certificate-card a {
+    width: 30rem;
+    height: 20rem;
+    overflow: hidden;
+}
+
+.img-download-btn {
+ 
+    position: absolute;
+    width: 30rem;
+    height: 20rem;
+    align-items: center;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0.1;
+    overflow: hidden;
+}
+
+.img-download-btn:hover {
+    background-color: #2f2f2f;
+    opacity: 1;
+    font-size: 20px;
+    font-weight: 700;
+    color: white;
+}
+
+#certifications #certificate-card span {
+    color: white;
+    width: 100%;
+    text-align: center;
+    padding: 10px;
+}
+
+#certifications #certificate-card img {
+    width: 25rem;
+    margin: auto;
+    padding-bottom: 10px;
+}
+
+.downloadRef {
+    overflow: hidden !important;
+}
