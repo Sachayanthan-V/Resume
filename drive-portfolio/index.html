@@ -236,6 +236,43 @@
     body.show-tools #speedo { display:none; }
     #speedo { bottom:auto; top:182px; right:16px; min-width:0; padding:6px 10px; } #speedo b { font-size:20px; } #speedo small { display:none; }
   }
+
+  /* Landscape Play mode on phones: thumbs on either side, compact HUD, panels as side sheets */
+  #rotate-hint { position:fixed; left:12px; right:12px; bottom:170px; z-index:9; background:#15131fee; color:#fff; border-radius:14px; padding:10px 12px; display:flex; gap:10px; align-items:center; font-size:13px; font-weight:600; box-shadow:0 10px 30px #0004; }
+  #rotate-hint .rh-ico { font-size:20px; } #rotate-hint span:nth-child(2) { flex:1; }
+  #rotate-hint button { background:var(--grad); color:#fff; border-radius:999px; padding:7px 11px; font-weight:800; font-size:12px; white-space:nowrap; }
+  #rotate-hint #rh-close { background:#ffffff22; padding:7px 9px; }
+  @media (orientation:landscape) { #rotate-hint { display:none !important; } }
+  @media (orientation:landscape) and (max-height:520px) {
+    #hud-top { top:8px; left:12px; right:auto; max-width:46vw; } #hud-top h1 { font-size:14px; } #hud-top p { display:none; }
+    .mini { width:28px; height:28px; font-size:13px; }
+    #hud-stats { max-width:46vw; } #hud-stats .pill, .chip { font-size:11px; padding:3px 8px; }
+    #minimap { top:8px; right:12px; width:104px; height:104px; border-radius:12px; }
+    #hud-btns { top:118px; right:12px; }
+    #tools { top:8px; right:126px; flex-direction:row; flex-wrap:wrap; justify-content:flex-end; max-width:min(440px, 52vw); gap:5px; }
+    #tools button, #tools a { padding:5px 8px !important; font-size:11px !important; }
+    #speedo { top:auto !important; bottom:12px !important; right:50% !important; transform:translateX(50%); min-width:0; padding:4px 12px !important; border-radius:999px; }
+    #speedo b { font-size:18px !important; } #speedo small { display:none; }
+    body.show-tools #speedo { display:block; }
+    #touch { height:100%; }
+    #touch button { width:62px; height:62px; font-size:20px; background:#1d243380; }
+    #touch [data-k="left"]  { left:20px !important;  bottom:22px !important; }
+    #touch [data-k="right"] { left:96px !important;  bottom:22px !important; }
+    #touch [data-k="up"]    { right:20px !important; bottom:22px !important; width:74px; height:74px; }
+    #touch [data-k="down"]  { right:106px !important; bottom:16px !important; }
+    #touch [data-k="boost"] { right:20px !important; bottom:110px !important; }
+    #touch [data-k="brake"] { right:96px !important; bottom:96px !important; }
+    #touch [data-k="throw"] { right:172px !important; bottom:66px !important; width:54px; height:54px; font-size:10px !important; }
+    #prompt { bottom:96px; font-size:13px; padding:8px 14px; max-width:50vw; }
+    #toast { top:10px; font-size:13px; padding:8px 14px; max-width:44vw; }
+    #caption { bottom:96px; width:min(560px, 56vw); font-size:13px; }
+    #charge { bottom:96px; }
+    #help { left:12px; right:auto; top:44px; bottom:auto; width:min(520px, 60vw); max-height:calc(100vh - 140px); overflow:auto; font-size:11px; }
+    #sheet, #garage { left:12px; top:8px; bottom:8px; transform:none; width:min(380px, 48vw); max-height:none; }
+    #panel { width:min(440px, 55vw); padding:18px 20px 30px; } #panel h2 { font-size:22px; }
+    .overlay .intro h1 { font-size:28px; } #intro .ask { margin:12px 0 8px; } #intro p { display:none; }
+    #intro .choice { padding:14px 16px; } #intro .choice span:not(.ch-ico) { font-size:12.5px; }
+  }
 </style>
 </head>
 <body>
@@ -244,7 +281,7 @@
   <canvas id="loaderCanvas" aria-hidden="true"></canvas>
   <div class="ld-center"><span class="ld-pct" id="ldPct">0</span><span class="ld-label">Loading</span></div>
 </div>
-<script src="../Portfolio/js/loader.js?v=20261011b"></script>
+<script src="../Portfolio/js/loader.js?v=20261011d"></script>
 <canvas id="scene"></canvas>
 
 <div id="hud-top">
@@ -327,12 +364,16 @@
   <div id="sheet-body"></div>
 </div>
 
+<div id="rotate-hint" class="hidden">
+  <span class="rh-ico">📱↻</span><span>Turn your phone sideways for the best Play mode.</span>
+  <button id="rh-full">Go landscape</button><button id="rh-close" aria-label="Dismiss">✕</button>
+</div>
 <div id="touch" class="hidden">
   <button data-k="left"  style="left:16px;bottom:30px">◀</button>
   <button data-k="right" style="left:100px;bottom:30px">▶</button>
   <button data-k="down"  style="right:100px;bottom:30px">▼</button>
   <button data-k="up"    style="right:16px;bottom:30px">▲</button>
-  <button data-k="boost" style="right:16px;bottom:110px;font-size:14px">BOOST</button>
+  <button data-k="boost" style="right:16px;bottom:110px;font-size:13px">▲<br>BOOST</button>
   <button data-k="brake" style="right:100px;bottom:110px;font-size:12px">JUMP<br>DRIFT</button>
   <button data-k="throw" style="right:184px;bottom:110px;font-size:12px">THROW</button>
 </div>
@@ -370,8 +411,8 @@
 </div>
 
 <script src="js/three.min.js"></script>
-<script src="js/data.js?v=20261011b"></script>
-<script src="js/voices.js?v=20261011b"></script>
-<script src="js/game.js?v=20261011b"></script>
+<script src="js/data.js?v=20261011d"></script>
+<script src="js/voices.js?v=20261011d"></script>
+<script src="js/game.js?v=20261011d"></script>
 </body>
 </html>

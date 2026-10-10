@@ -3461,7 +3461,16 @@ setTimeout(() => { // a beat later, so the loader can paint before the world is 
     if (isTouch) $('#touch').classList.remove('hidden');
     startAudio();
     setTimeout(() => narrate('narrator.intro'), 900);
+    // phones held upright: suggest turning sideways (and offer to lock landscape where the browser allows it)
+    let rhDismissed = false; try { rhDismissed = sessionStorage.getItem('rh-off') === '1'; } catch { /* fine */ }
+    if (isTouch && !rhDismissed && innerHeight > innerWidth) $('#rotate-hint').classList.remove('hidden');
   };
+  $('#rh-close').onclick = () => { $('#rotate-hint').classList.add('hidden'); try { sessionStorage.setItem('rh-off', '1'); } catch { /* fine */ } };
+  $('#rh-full').onclick = async () => {
+    try { await document.documentElement.requestFullscreen(); await screen.orientation.lock('landscape'); $('#rotate-hint').classList.add('hidden'); }
+    catch { toast('Rotate your phone sideways — the controls move to your thumbs.'); }
+  };
+  addEventListener('orientationchange', () => setTimeout(resize, 250));
   const CAM_NAMES = ['Chase', 'Isometric', 'Top-down', 'First person'];
   function cycleCam() { camMode = (camMode + 1) % 4; toast(`Camera: ${CAM_NAMES[camMode]}`); $('#btn-cam').textContent = `Camera: ${CAM_NAMES[camMode]}`; }
   $('#btn-cam').onclick = cycleCam;
@@ -3892,7 +3901,7 @@ setTimeout(() => { // a beat later, so the loader can paint before the world is 
   function step(dt) {
     if (S.pose && !S.rescue && started && !panelOpen && !garageOpen && !sheetOpen && (keys.up || keys.down || keys.left || keys.right || keys.brake)) { stand(); step.jumpHeld = true; }
     const input = started && !panelOpen && !garageOpen && !fading && !sheetOpen && !S.pose && !S.act && !S.rescue && !actLock() && !(race && race.t < 0);
-    const up = input && keys.up, down = input && keys.down, left = input && keys.left, right = input && keys.right;
+    const up = input && (keys.up || (isTouch && keys.boost)), down = input && keys.down, left = input && keys.left, right = input && keys.right;
     const boost = input && keys.boost && up, hb = input && keys.brake;
     if (S.boostT > 0) S.boostT -= dt;
     const maxF = S.boostT > 0 ? spec.boostMax * 1.3 : boost ? spec.boostMax : spec.max;
@@ -4170,7 +4179,7 @@ setTimeout(() => { // a beat later, so the loader can paint before the world is 
     model.visible = !fp;                                   // don't render your own car/body from the inside
     const k = fp ? 1 : 1 - Math.exp(-(started ? 5 : 1.5) * dt);
     camPos.lerp(desired, k); look.lerp(target, k);
-    const fov = (innerWidth < innerHeight ? 70 : 55) + (fp ? 14 : 0);
+    const fov = (innerWidth < innerHeight ? 70 : innerHeight < 520 ? 62 : 55) + (fp ? 14 : 0);
     if (Math.abs(camera.fov - fov) > 0.05) { camera.fov += (fov - camera.fov) * Math.min(1, dt * 6); camera.updateProjectionMatrix(); }
     camera.position.copy(camPos);
     if (S.shake > 0) {
@@ -4189,7 +4198,7 @@ setTimeout(() => { // a beat later, so the loader can paint before the world is 
   function resize() {
     const w = innerWidth, h = innerHeight;
     renderer.setSize(w, h, false); camera.aspect = w / h;
-    camera.fov = w < h ? 70 : 55; camera.updateProjectionMatrix();
+    camera.fov = w < h ? 70 : h < 520 ? 62 : 55; camera.updateProjectionMatrix();
   }
   addEventListener('resize', resize); resize();
 
