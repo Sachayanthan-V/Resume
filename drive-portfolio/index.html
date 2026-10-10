@@ -273,6 +273,24 @@
     .overlay .intro h1 { font-size:28px; } #intro .ask { margin:12px 0 8px; } #intro p { display:none; }
     #intro .choice { padding:14px 16px; } #intro .choice span:not(.ch-ico) { font-size:12.5px; }
   }
+  /* very short landscape screens (phone browsers with their address bar showing ≈ 280–360px tall) */
+  @media (orientation:landscape) and (max-height:380px) {
+    #hud-top h1 { font-size:12px; } .hud-bar { margin-top:4px; }
+    #minimap { width:84px; height:84px; top:6px; right:8px; }
+    #hud-btns { top:8px; right:100px; flex-direction:column; gap:5px; }
+    #tools { top:6px; right:140px; max-width:min(420px, 50vw); }
+    #touch button { width:52px; height:52px; font-size:16px; }
+    #touch [data-k="left"]  { left:14px !important; bottom:12px !important; width:60px; height:60px; }
+    #touch [data-k="right"] { left:84px !important; bottom:12px !important; width:60px; height:60px; }
+    #touch [data-k="down"]  { right:14px !important;  bottom:10px !important; width:48px; height:48px; }
+    #touch [data-k="up"]    { right:72px !important;  bottom:10px !important; width:58px; height:58px; }
+    #touch [data-k="boost"] { right:14px !important;  bottom:68px !important; width:58px; height:58px; font-size:11px !important; }
+    #touch [data-k="brake"] { right:140px !important; bottom:10px !important; width:50px; height:50px; font-size:9.5px !important; }
+    #touch [data-k="throw"] { right:82px !important;  bottom:78px !important; width:46px; height:46px; font-size:9px !important; }
+    #speedo { padding:2px 10px !important; } #speedo b { font-size:15px !important; }
+    #prompt, #caption, #charge { bottom:70px; } #toast { max-width:40vw; font-size:12px; padding:6px 12px; }
+    #help, #sheet, #garage { top:6px; bottom:6px; max-height:none; }
+  }
 </style>
 </head>
 <body>
@@ -281,7 +299,7 @@
   <canvas id="loaderCanvas" aria-hidden="true"></canvas>
   <div class="ld-center"><span class="ld-pct" id="ldPct">0</span><span class="ld-label">Loading</span></div>
 </div>
-<script src="../Portfolio/js/loader.js?v=20261011d"></script>
+<script src="../Portfolio/js/loader.js?v=20261011e"></script>
 <canvas id="scene"></canvas>
 
 <div id="hud-top">
@@ -411,8 +429,8 @@
 </div>
 
 <script src="js/three.min.js"></script>
-<script src="js/data.js?v=20261011d"></script>
-<script src="js/voices.js?v=20261011d"></script>
-<script src="js/game.js?v=20261011d"></script>
+<script src="js/data.js?v=20261011e"></script>
+<script src="js/voices.js?v=20261011e"></script>
+<script src="js/game.js?v=20261011e"></script>
 </body>
 </html>
