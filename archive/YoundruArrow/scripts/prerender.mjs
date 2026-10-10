@@ -1,0 +1,12 @@
+import { readFile, writeFile, mkdir, rm } from 'node:fs/promises';
+import { render } from '../.prerender/entry-server.js';
+const path = new URL('../dist/index.html', import.meta.url);
+const template = await readFile(path, 'utf8');
+await writeFile(path, template.replace('<!--app-html-->', render()));
+const base = process.env.BASE_PATH || '/Resume/';
+let notFound = await readFile(new URL('../public/404.html', import.meta.url), 'utf8');
+notFound = notFound.replaceAll('__BASE__', base);
+await writeFile(new URL('../dist/404.html', import.meta.url), notFound);
+await mkdir(new URL('../dist/', import.meta.url), { recursive: true });
+await rm(new URL('../.prerender/', import.meta.url), { recursive: true });
+console.log('Prerendered all six chapters and static 404.');

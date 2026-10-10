@@ -1,0 +1,13 @@
+node_modules/
+dist/
+.prerender/
+test-results/
+playwright-report/
+tmp/
+.env*
+!.env.example
+.DS_Store
+ResumeSep26.pdf
+answers.txt
+WEBSITE_BUILD_PLAN.md
+

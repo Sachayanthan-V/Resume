@@ -1,0 +1,742 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Sachayanthan V — MTS-3, Senior Software Developer at Aquera</title>
+<meta name="description" content="Sachayanthan V — MTS-3 / Senior Software Developer at Aquera, building integration engines and orchestrating AI workflows." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Caveat:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css?v=20261011">
+<script>
+  // theme before first paint (no flash): saved choice, else light (the default)
+  try { var t = localStorage.getItem('theme'); if (!t) t = 'light'; document.documentElement.dataset.theme = t; } catch (e) {}
+</script>
+</head>
+<body>
+<!-- loader: particles gather into a ring as resources load; removed at 100% -->
+<div class="loader" id="loader" role="progressbar" aria-label="Loading" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+  <canvas id="loaderCanvas" aria-hidden="true"></canvas>
+  <div class="ld-center"><span class="ld-pct" id="ldPct">0</span><span class="ld-label">Loading</span></div>
+</div>
+<script src="js/loader.js?v=20261011"></script>
+
+<!-- ============ ICON SPRITE (Lucide-style, MIT) ============ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-arrow-right" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></symbol>
+    <symbol id="i-arrow-up-right" viewBox="0 0 24 24"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></symbol>
+    <symbol id="i-arrow-up" viewBox="0 0 24 24"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></symbol>
+    <symbol id="i-linkedin" viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></symbol>
+    <symbol id="i-github" viewBox="0 0 24 24"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></symbol>
+    <symbol id="i-briefcase" viewBox="0 0 24 24"><path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><rect width="20" height="14" x="2" y="6" rx="2"/></symbol>
+    <symbol id="i-cap" viewBox="0 0 24 24"><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"/><path d="M22 10v6"/><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+    <symbol id="i-layers" viewBox="0 0 24 24"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/></symbol>
+    <symbol id="i-bot" viewBox="0 0 24 24"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></symbol>
+    <symbol id="i-rocket" viewBox="0 0 24 24"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></symbol>
+    <symbol id="i-award" viewBox="0 0 24 24"><path d="m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526"/><circle cx="12" cy="8" r="6"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+    <symbol id="i-pen" viewBox="0 0 24 24"><path d="M15.707 21.293a1 1 0 0 1-1.414 0l-1.586-1.586a1 1 0 0 1 0-1.414l5.586-5.586a1 1 0 0 1 1.414 0l1.586 1.586a1 1 0 0 1 0 1.414z"/><path d="m18 13-1.375-6.874a1 1 0 0 0-.746-.776L3.235 2.028a1 1 0 0 0-1.207 1.207L5.35 15.879a1 1 0 0 0 .776.746L13 18"/><path d="m2.3 2.3 7.286 7.286"/><circle cx="11" cy="11" r="2"/></symbol>
+    <symbol id="i-code" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"/><path d="m21.854 2.147-10.94 10.939"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></symbol>
+    <symbol id="i-gamepad" viewBox="0 0 24 24"><line x1="6" x2="10" y1="11" y2="11"/><line x1="8" x2="8" y1="9" y2="13"/><line x1="15" x2="15.01" y1="12" y2="12"/><line x1="18" x2="18.01" y1="10" y2="10"/><path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z"/></symbol>
+    <symbol id="i-plug" viewBox="0 0 24 24"><path d="M12 22v-5"/><path d="M9 8V2"/><path d="M15 8V2"/><path d="M18 8v5a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4V8Z"/></symbol>
+    <symbol id="i-network" viewBox="0 0 24 24"><rect x="16" y="16" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="9" y="2" width="6" height="6" rx="1"/><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3"/><path d="M12 12V8"/></symbol>
+    <symbol id="i-sparkles" viewBox="0 0 24 24"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></symbol>
+    <symbol id="i-handshake" viewBox="0 0 24 24"><path d="m11 17 2 2a1 1 0 1 0 3-3"/><path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4"/><path d="m21 3 1 11h-2"/><path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3"/><path d="M3 4h8"/></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></symbol>
+    <symbol id="i-workflow" viewBox="0 0 24 24"><rect width="8" height="8" x="3" y="3" rx="2"/><path d="M7 11v4a2 2 0 0 0 2 2h4"/><rect width="8" height="8" x="13" y="13" rx="2"/></symbol>
+    <symbol id="i-message" viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></symbol>
+    <symbol id="i-repeat" viewBox="0 0 24 24"><path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/></symbol>
+    <symbol id="i-trend" viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></symbol>
+    <symbol id="i-zap" viewBox="0 0 24 24"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></symbol>
+    <symbol id="i-instagram" viewBox="0 0 24 24"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></symbol>
+    <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></symbol>
+    <symbol id="i-cpu" viewBox="0 0 24 24"><rect width="16" height="16" x="4" y="4" rx="2"/><rect width="6" height="6" x="9" y="9" rx="1"/><path d="M15 2v2"/><path d="M15 20v2"/><path d="M2 15h2"/><path d="M2 9h2"/><path d="M20 15h2"/><path d="M20 9h2"/><path d="M9 2v2"/><path d="M9 20v2"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+    <symbol id="i-bulb" viewBox="0 0 24 24"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></symbol>
+    <symbol id="i-brain" viewBox="0 0 24 24"><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/><path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/><path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"/><path d="M17.599 6.5a3 3 0 0 0 .399-1.375"/><path d="M6.003 5.125A3 3 0 0 0 6.401 6.5"/><path d="M3.477 10.896a4 4 0 0 1 .585-.396"/><path d="M19.938 10.5a4 4 0 0 1 .585.396"/><path d="M6 18a4 4 0 0 1-1.967-.516"/><path d="M19.967 17.484A4 4 0 0 1 18 18"/></symbol>
+    <symbol id="i-gear" viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="i-volume" viewBox="0 0 24 24"><path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><path d="M16 9a5 5 0 0 1 0 6"/><path d="M19.364 18.364a9 9 0 0 0 0-12.728"/></symbol>
+  </defs>
+</svg>
+
+<nav class="nav" id="nav">
+  <a href="#top" class="nav-logo">SV<span>.</span></a>
+  <div class="nav-links">
+    <a href="#about">About</a>
+    <a href="#projects">Work</a>
+    <a href="#experience">Journey</a>
+    <a href="#skills">Skills</a>
+    <a href="#contact">Contact</a>
+  </div>
+  <div class="nav-actions">
+    <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to dark theme" title="Dark / light theme">
+      <svg class="icon i-moon"><use href="#i-moon"/></svg><svg class="icon i-sun"><use href="#i-sun"/></svg>
+    </button>
+    <a class="nav-play" href="../drive-portfolio/index.html?play" title="Explore this portfolio as a drivable 3D world"><svg class="icon"><use href="#i-gamepad"/></svg>Play mode</a>
+    <a class="btn btn-primary btn-sm" href="assets/Sachayanthan_V_Resume.pdf" download><svg class="icon"><use href="#i-download"/></svg>Resume</a>
+  </div>
+</nav>
+
+<!-- ============ STORY INTRO + HERO (one pinned sequence) ============ -->
+<section class="intro" id="top">
+  <div class="intro-pin">
+
+    <!-- intro mode 2 (autoplay split): the image card beside the questions -->
+    <div class="split-card" id="splitCard" aria-hidden="true">
+      <div class="split-img" style="background-image:url(images/story-1.jpg)"></div>
+      <div class="split-img" style="background-image:url(images/story-2.jpg)"></div>
+      <div class="split-img" style="background-image:url(images/story-3.jpg)"></div>
+      <div class="split-img" style="background-image:url(images/story-4.jpg)"></div>
+      <div class="split-img" style="background-image:url(images/story-5.jpg)"></div>
+      <div class="split-img" style="background-image:url(images/story-6.jpg)"></div>
+    </div>
+
+    <!-- decorative rings + dots behind the landing collage -->
+    <div class="intro-deco" id="introDeco" aria-hidden="true">
+      <span class="ring ring-1"></span><span class="ring ring-2"></span><span class="dots dots-1"></span>
+    </div>
+
+    <!-- the same six images as tiles: they fly into this collage once the questions end -->
+    <div class="intro-images" id="introImages">
+      <!-- story-1..6.jpg come from 6Images/ (one per question, in order). To swap, replace the file with the same name. -->
+      <div class="simg" data-i="0" style="background-image:url(images/story-1.jpg)"></div>
+      <div class="simg" data-i="1" style="background-image:url(images/story-2.jpg)"></div>
+      <div class="simg" data-i="2" style="background-image:url(images/story-3.jpg)"></div>
+      <div class="simg" data-i="3" style="background-image:url(images/story-4.jpg)"></div>
+      <div class="simg" data-i="4" style="background-image:url(images/story-5.jpg)"></div>
+      <div class="simg" data-i="5" style="background-image:url(images/story-6.jpg)"></div>
+    </div>
+
+    <div class="intro-copy">
+
+      <div class="stage q-stage">
+        <p class="eyebrow">Looking for someone who…</p>
+        <h2 class="question" data-i="0">…thinks <em>beyond</em> <br>the lines of code?</h2>
+        <h2 class="question" data-i="1">…turns ambitious ideas <br>into <em>working reality</em>?</h2>
+        <h2 class="question" data-i="2">…understands both <em>code</em> <br>and the <em>physical world</em>?</h2>
+        <h2 class="question" data-i="3">…turns AI capabilities <br>into <em>useful systems</em>?</h2>
+        <h2 class="question" data-i="4">…solves the problem <br>when the <em>stakes are high</em>?</h2>
+        <h2 class="question" data-i="5">…makes things <em>work</em>, <br>not just sound good?</h2>
+      </div>
+
+      <!-- landing: welcome copy first, then (one more scroll) actions + pillars -->
+      <div class="stage landing-stage">
+        <div class="landing-intro">
+          <p class="eyebrow eyebrow-line">Welcome to my page</p>
+          <h1 class="landing-name">I'm<br>Sachayanthan V.</h1>
+          <p class="landing-call">You can call me <span class="nowrap"><span class="scribble"><span class="accent-text">Sachin</span><svg viewBox="0 0 200 20" preserveAspectRatio="none" aria-hidden="true"><path d="M3 14 C 45 4, 120 3, 197 11"/></svg></span>.</span></p>
+          <p class="landing-role"><span class="dot-live"></span>MTS-3 · Senior Software Developer at Aquera</p>
+          <p class="landing-sub">The engineer behind all of the above — <br>and I'm glad you found me.</p>
+        </div>
+        <div class="landing-more">
+          <div class="landing-actions">
+            <a href="#projects" class="btn btn-primary btn-lg">View My Work<svg class="icon"><use href="#i-arrow-right"/></svg></a>
+            <a href="#contact" class="btn btn-outline btn-lg">Get in Touch</a>
+          </div>
+          <ul class="landing-pillars">
+            <li><span class="pillar-ico ico-violet"><svg class="icon"><use href="#i-bulb"/></svg></span><span>Idea<br><small>to reality</small></span></li>
+            <li><span class="pillar-ico ico-blue"><svg class="icon"><use href="#i-code"/></svg></span><span>Software<br><small>to hardware</small></span></li>
+            <li><span class="pillar-ico ico-pink"><svg class="icon"><use href="#i-brain"/></svg></span><span>AI<br><small>to solutions</small></span></li>
+            <li><span class="pillar-ico ico-amber"><svg class="icon"><use href="#i-gear"/></svg></span><span>Ideas<br><small>to impact</small></span></li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <div class="intro-spacer" id="introSpacer"></div>
+</section>
+
+<!-- ============ TECH MARQUEE ============ -->
+<section class="marquee" aria-label="Technologies I work with">
+  <div class="marquee-track">
+    <span><img src="icons/nodedotjs.svg" alt="">Node.js</span><span><img src="icons/javascript.svg" alt="">JavaScript</span><span><img src="icons/express.svg" alt="">Express</span><span><img src="icons/amazonwebservices.svg" alt="">AWS</span><span><img src="icons/mongodb.svg" alt="">MongoDB</span><span><img src="icons/boomi.png" alt="" class="round">Boomi</span><span><img src="icons/openapiinitiative.svg" alt="">OpenAPI</span><span><img src="icons/react.svg" alt="">React</span><span><img src="icons/python.svg" alt="">Python</span><span><img src="icons/postman.svg" alt="">Postman</span><span><img src="icons/git.svg" alt="">Git</span>
+    <span aria-hidden="true"><img src="icons/nodedotjs.svg" alt="">Node.js</span><span aria-hidden="true"><img src="icons/javascript.svg" alt="">JavaScript</span><span aria-hidden="true"><img src="icons/express.svg" alt="">Express</span><span aria-hidden="true"><img src="icons/amazonwebservices.svg" alt="">AWS</span><span aria-hidden="true"><img src="icons/mongodb.svg" alt="">MongoDB</span><span aria-hidden="true"><img src="icons/boomi.png" alt="" class="round">Boomi</span><span aria-hidden="true"><img src="icons/openapiinitiative.svg" alt="">OpenAPI</span><span aria-hidden="true"><img src="icons/react.svg" alt="">React</span><span aria-hidden="true"><img src="icons/python.svg" alt="">Python</span><span aria-hidden="true"><img src="icons/postman.svg" alt="">Postman</span><span aria-hidden="true"><img src="icons/git.svg" alt="">Git</span>
+  </div>
+</section>
+
+<!-- ============ ABOUT ============ -->
+<section class="section about wash" id="about">
+  <span class="deco-ring dr-a" aria-hidden="true"></span><span class="deco-dots dd-a" aria-hidden="true"></span>
+  <div class="about-grid">
+    <div class="about-copy">
+      <p class="eyebrow eyebrow-line"><span class="eyebrow-n">01</span>About me</p>
+      <h2>I connect systems so <span class="scribble"><span class="accent-text">people</span><svg viewBox="0 0 200 20" preserveAspectRatio="none" aria-hidden="true"><path d="M3 12 C 60 4, 140 4, 197 12"/></svg></span> don't have to.</h2>
+      <p class="lead"><span class="mark">MTS-3</span> (Senior Software Developer) at <span class="mark">Aquera</span> — focused on <span class="mark">system integrations and automation</span> — and the reusable engine underneath them.</p>
+      <ul class="mini-pillars">
+        <li><span class="pillar-ico ico-violet"><svg class="icon"><use href="#i-plug"/></svg></span><span>Enterprise<small>integrations</small></span></li>
+        <li><span class="pillar-ico ico-pink"><svg class="icon"><use href="#i-bot"/></svg></span><span>AI<small>orchestration</small></span></li>
+        <li><span class="pillar-ico ico-blue"><svg class="icon"><use href="#i-handshake"/></svg></span><span>Customer<small>delivery</small></span></li>
+      </ul>
+      <div class="about-actions">
+        <a href="assets/Sachayanthan_V_Resume.pdf" class="btn btn-primary btn-lg" download><svg class="icon"><use href="#i-download"/></svg>Download CV</a>
+        <a href="#contact" class="btn btn-outline btn-lg">Hire me</a>
+      </div>
+    </div>
+    <div class="about-visual">
+      <div class="photo-frame"><div class="photo" style="background-image:url(images/story-3.jpg)"></div></div>
+      <div class="float-badge fb-1"><span class="icon-tile"><svg class="icon"><use href="#i-clock"/></svg></span><span><strong><span class="num" data-to="5">5</span>+</strong>Years experience</span></div>
+      <div class="float-badge fb-2"><span class="icon-tile tile-2"><svg class="icon"><use href="#i-plug"/></svg></span><span><strong><span class="num" data-to="60">60</span>+</strong>Integrations delivered</span></div>
+      <div class="float-badge fb-3"><span class="icon-tile tile-3"><svg class="icon"><use href="#i-users"/></svg></span><span><strong><span class="num" data-to="70">70</span>+</strong>Customers handled</span></div>
+      <p class="handnote">Code connects people.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FEATURED WORK (horizontal scroll) ============ -->
+<section class="section hsection projects wash-alt" id="projects">
+  <div class="section-head">
+    <p class="eyebrow"><span class="eyebrow-n">02</span>Featured work</p>
+    <h2>Build once. <span class="accent-text">Connect many.</span></h2>
+    <p class="section-sub">NDA-bound work as <span class="mark">high-level case studies</span>, my own product, and builds that push AI, full stack and system design.</p>
+  </div>
+  <div class="hscroll-pin" id="projectsPin">
+    <div class="hscroll-track" id="projectsTrack">
+
+      <article class="card project-card">
+        <div class="card-visual cv-1"><svg class="icon"><use href="#i-shield"/></svg><span class="card-tag">Integration</span></div>
+        <h3>Enterprise Identity Integration</h3>
+        <p>Connected <strong class="em">HR systems, Active Directory and Microsoft Entra</strong> into one reliable onboarding / offboarding flow for enterprise customers.</p>
+        <div class="tool-row"><span>Boomi</span><span>OpenAPI</span><span>IAM</span></div>
+      </article>
+
+      <article class="card project-card">
+        <div class="card-visual cv-2"><svg class="icon"><use href="#i-layers"/></svg><span class="card-tag">Platform</span></div>
+        <h3>Reusable Integration Engine</h3>
+        <p>Improved the core engine so new connectors — <strong class="em">ADP, Greenhouse, UKG, Dayforce, Workday</strong> — get built in days, not weeks.</p>
+        <div class="tool-row"><span>Node.js</span><span>Apigee</span><span>OpenAPI</span></div>
+      </article>
+
+      <article class="card project-card">
+        <div class="card-visual cv-3"><svg class="icon"><use href="#i-workflow"/></svg><span class="card-tag">AI</span></div>
+        <h3>AI Workflow Orchestration</h3>
+        <p>Gave every AI tool a role — requirements, architecture, build, QA, reporting — coordinated as <strong class="em">one workflow with human review</strong> at each step.</p>
+        <div class="tool-row"><span>~100 specialized skills</span></div>
+      </article>
+
+      <article class="card project-card project-card--mine">
+        <div class="card-visual cv-4"><svg class="icon"><use href="#i-sparkles"/></svg><span class="card-tag">My product</span></div>
+        <h3>Zungga — Kids Learning Platform</h3>
+        <p>Turning <strong class="em">screen time into skill time</strong> for kids — from an idea to a live, working platform.</p>
+        <a class="link-underline" href="https://zungga.com" target="_blank" rel="noopener">Visit zungga.com<svg class="icon"><use href="#i-arrow-up-right"/></svg></a>
+      </article>
+
+      <!-- DRAFT projects (written for the user to confirm/edit — no invented metrics, users or links) -->
+      <article class="card project-card">
+        <div class="card-visual cv-5"><svg class="icon"><use href="#i-bot"/></svg><span class="card-tag">AI</span></div>
+        <h3>Multi-Agent Code Review</h3>
+        <p>Specialist AI reviewers for <strong class="em">security, performance and style</strong>, coordinated by an orchestrator into one consolidated review — a human approves before anything merges.</p>
+        <div class="tool-row"><span>Node.js</span><span>LLM APIs</span><span>GitHub Actions</span></div>
+      </article>
+
+      <article class="card project-card">
+        <div class="card-visual cv-6"><svg class="icon"><use href="#i-book"/></svg><span class="card-tag">AI</span></div>
+        <h3>RAG Assistant for API Docs</h3>
+        <p>Retrieval-augmented assistant over connector docs and <strong class="em">OpenAPI specs</strong> — answers integration how-to questions and cites the exact source section.</p>
+        <div class="tool-row"><span>Python</span><span>Embeddings</span><span>Vector search</span></div>
+      </article>
+
+      <article class="card project-card">
+        <div class="card-visual cv-7"><svg class="icon"><use href="#i-check"/></svg><span class="card-tag">AI</span></div>
+        <h3>AI Test Generator from OpenAPI</h3>
+        <p>Reads an OpenAPI spec, generates <strong class="em">edge-case test suites</strong>, runs them against the API and reports the gaps it found.</p>
+        <div class="tool-row"><span>Node.js</span><span>OpenAPI</span><span>LLM</span><span>Newman</span></div>
+      </article>
+
+      <article class="card project-card">
+        <div class="card-visual cv-8"><svg class="icon"><use href="#i-users"/></svg><span class="card-tag">Full stack</span></div>
+        <h3>Real-time Collaborative Whiteboard</h3>
+        <p>Shared canvas with <strong class="em">live cursors, rooms and instant sync</strong> across users, with authentication and saved boards.</p>
+        <div class="tool-row"><span>React</span><span>Node.js</span><span>Socket.IO</span><span>MongoDB</span></div>
+      </article>
+
+      <article class="card project-card">
+        <div class="card-visual cv-9"><svg class="icon"><use href="#i-chart"/></svg><span class="card-tag">Full stack</span></div>
+        <h3>Multi-tenant SaaS Admin</h3>
+        <p>Admin platform with <strong class="em">tenant isolation, role-based access</strong>, audit logs and usage analytics dashboards.</p>
+        <div class="tool-row"><span>React</span><span>Express</span><span>MongoDB</span><span>Passport.js</span></div>
+      </article>
+
+      <article class="card project-card">
+        <div class="card-visual cv-10"><svg class="icon"><use href="#i-network"/></svg><span class="card-tag">System design</span></div>
+        <h3>Event-Driven Integration Hub</h3>
+        <p>Queue-based sync engine with <strong class="em">retries, idempotency, dead-letter queues</strong> and rate limiting — designed so one failing system never blocks the rest.</p>
+        <div class="tool-row"><span>Node.js</span><span>AWS SQS</span><span>Lambda</span><span>MongoDB</span></div>
+      </article>
+
+      <div class="hscroll-end">That's the showcase.<span>More builds below <svg class="icon"><use href="#i-arrow-right"/></svg></span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DAILY RHYTHM (illustrative contribution graph — not live GitHub data) ============ -->
+<section class="section rhythm wash" id="rhythm" aria-labelledby="rhythmTitle">
+  <div class="rhythm-head">
+    <div>
+      <p class="eyebrow eyebrow-line">Daily rhythm</p>
+      <h2 id="rhythmTitle">I show up <span class="accent-text">every day.</span></h2>
+    </div>
+    <p class="rhythm-note"><svg class="icon"><use href="#i-shield"/></svg>My daily commits, customer calls and AI work happen in private work systems, so these are illustrations of my rhythm — not live data.</p>
+  </div>
+  <div class="cal-stack">
+  <div class="cal-card cal-code" data-kind="code">
+    <div class="cal-title"><span class="cal-ico"><svg class="icon"><use href="#i-code"/></svg></span><strong>Coding</strong></div>
+    <div class="cal-scroll">
+      <div class="cal-months" aria-hidden="true"></div>
+      <div class="cal-body">
+        <div class="cal-days" aria-hidden="true"><span></span><span>Mon</span><span></span><span>Wed</span><span></span><span>Fri</span><span></span></div>
+        <div class="cal-grid" role="img" aria-label="Illustrative grid of daily coding activity over the past year"></div>
+      </div>
+    </div>
+    <div class="cal-foot">
+      <span>365 days of building</span>
+      <span class="cal-legend" aria-hidden="true">Less<i class="l0"></i><i class="l1"></i><i class="l2"></i><i class="l3"></i><i class="l4"></i>More</span>
+    </div>
+  </div>
+  <div class="cal-card cal-customer" data-kind="customer">
+    <div class="cal-title"><span class="cal-ico"><svg class="icon"><use href="#i-handshake"/></svg></span><strong>Customer interaction</strong></div>
+    <div class="cal-scroll">
+      <div class="cal-months" aria-hidden="true"></div>
+      <div class="cal-body">
+        <div class="cal-days" aria-hidden="true"><span></span><span>Mon</span><span></span><span>Wed</span><span></span><span>Fri</span><span></span></div>
+        <div class="cal-grid" role="img" aria-label="Illustrative grid of daily customer interaction over the past year"></div>
+      </div>
+    </div>
+    <div class="cal-foot">
+      <span>Calls, requirements and go-lives — every working day</span>
+      <span class="cal-legend" aria-hidden="true">Less<i class="l0"></i><i class="l1"></i><i class="l2"></i><i class="l3"></i><i class="l4"></i>More</span>
+    </div>
+  </div>
+  <div class="cal-card cal-ai" data-kind="ai">
+    <div class="cal-title"><span class="cal-ico"><svg class="icon"><use href="#i-sparkles"/></svg></span><strong>AI learning &amp; adaptability</strong></div>
+    <div class="cal-scroll">
+      <div class="cal-months" aria-hidden="true"></div>
+      <div class="cal-body">
+        <div class="cal-days" aria-hidden="true"><span></span><span>Mon</span><span></span><span>Wed</span><span></span><span>Fri</span><span></span></div>
+        <div class="cal-grid" role="img" aria-label="Illustrative grid of daily AI learning and usage over the past year"></div>
+      </div>
+    </div>
+    <div class="cal-foot">
+      <span>Learning and using new AI tools — growing through the year</span>
+      <span class="cal-legend" aria-hidden="true">Less<i class="l0"></i><i class="l1"></i><i class="l2"></i><i class="l3"></i><i class="l4"></i>More</span>
+    </div>
+  </div>
+  </div>
+</section>
+
+<!-- ============ MORE BUILDS (personal & learning projects) ============ -->
+<section class="section builds wash" id="builds">
+  <div class="section-head">
+    <p class="eyebrow"><span class="eyebrow-n">03</span>More builds</p>
+    <h2>Things I built to <span class="scribble"><span class="accent-text">learn</span><svg viewBox="0 0 200 20" preserveAspectRatio="none" aria-hidden="true"><path d="M3 13 C 55 4, 135 5, 197 11"/></svg></span> — and kept live.</h2>
+    <p class="section-sub">Personal and learning projects from my full-stack track. Small, honest, and still running.</p>
+  </div>
+  <div class="builds-grid">
+    <!-- DRAFT advanced builds (written for the user to confirm/edit — no invented metrics or links) -->
+    <article class="build">
+      <div class="build-img build-art" style="--c:#6d28d9"><svg class="icon"><use href="#i-workflow"/></svg></div>
+      <div class="build-body"><div class="build-meta"><span class="pill pill-adv">Advanced</span></div><h3>Visual Workflow Builder</h3><p>Drag-and-drop flow designer that compiles into executable integration pipelines, with step-level logs and replay.</p><div class="tool-row"><span>React</span><span>Node.js</span><span>MongoDB</span></div></div>
+    </article>
+    <article class="build">
+      <div class="build-img build-art" style="--c:#0f9f8f"><svg class="icon"><use href="#i-shield"/></svg></div>
+      <div class="build-body"><div class="build-meta"><span class="pill pill-adv">Advanced</span></div><h3>Distributed Rate Limiter</h3><p>Token-bucket limiter shared across service instances — fair per-tenant quotas without a single point of failure.</p><div class="tool-row"><span>Node.js</span><span>Redis</span><span>Docker</span></div></div>
+    </article>
+    <article class="build">
+      <div class="build-img build-art" style="--c:#db2777"><svg class="icon"><use href="#i-send"/></svg></div>
+      <div class="build-body"><div class="build-meta"><span class="pill pill-adv">Advanced</span></div><h3>Webhook Delivery Service</h3><p>Signed webhooks with exponential retries, idempotency keys and a dead-letter queue for failed deliveries.</p><div class="tool-row"><span>Express</span><span>AWS SQS</span><span>MongoDB</span></div></div>
+    </article>
+    <article class="build">
+      <div class="build-img build-art" style="--c:#2563eb"><svg class="icon"><use href="#i-chart"/></svg></div>
+      <div class="build-body"><div class="build-meta"><span class="pill pill-adv">Advanced</span></div><h3>Log Analytics &amp; Alerting</h3><p>Ingests service logs, indexes them for search, and raises threshold alerts before customers notice.</p><div class="tool-row"><span>Node.js</span><span>Elasticsearch</span><span>Grafana</span></div></div>
+    </article>
+    <article class="build">
+      <div class="build-img build-art" style="--c:#ea580c"><svg class="icon"><use href="#i-bot"/></svg></div>
+      <div class="build-body"><div class="build-meta"><span class="pill pill-adv">Advanced</span></div><h3>AI Meeting-to-Tasks</h3><p>Turns meeting transcripts into structured action items and drafts tickets for human review.</p><div class="tool-row"><span>Python</span><span>LLM</span><span>Jira API</span></div></div>
+    </article>
+    <article class="build">
+      <div class="build-img build-art" style="--c:#16a34a"><svg class="icon"><use href="#i-zap"/></svg></div>
+      <div class="build-body"><div class="build-meta"><span class="pill pill-adv">Advanced</span></div><h3>Offline-first Field App</h3><p>Progressive web app that works without a network and syncs safely with conflict resolution when back online.</p><div class="tool-row"><span>React</span><span>IndexedDB</span><span>Service Worker</span></div></div>
+    </article>
+    <div class="builds-divider">
+      <span class="icon-tile tile-4"><svg class="icon"><use href="#i-cap"/></svg></span>
+      <div><h3>Earlier builds — before AI tools</h3><p>Built during college and my early learning years, written by hand without any AI assistance.</p></div>
+    </div>
+    <article class="build">
+      <div class="build-img" style="background-color:#fc8e22"><img src="images/projects/project-1.png" alt="" loading="lazy"></div>
+      <div class="build-body"><div class="build-meta"><span class="pill pill-noai">Pre-AI</span><time>Apr 2023</time></div><h3>Placement Cell</h3><p>Full-stack web app for running a college placement cell.</p></div>
+    </article>
+    <article class="build">
+      <div class="build-img" style="background-color:#1478c9"><img src="images/projects/project-2.png" alt="" loading="lazy"></div>
+      <div class="build-body"><div class="build-meta"><span class="pill pill-noai">Pre-AI</span><time>May 2023</time></div><h3>Employee Review System</h3><p>Web app for managing employee performance reviews.</p></div>
+    </article>
+    <article class="build">
+      <div class="build-img" style="background-color:#413e51"><img src="images/projects/project-4.png" alt="" loading="lazy"></div>
+      <div class="build-body"><div class="build-meta"><span class="pill pill-noai">Pre-AI</span><span class="pill">API</span><time>May 2023</time></div><h3>E-commerce API</h3><p>REST API serving a product catalogue, built with Node.js.</p></div>
+    </article>
+    <article class="build">
+      <div class="build-img" style="background-color:#f9b978"><img src="images/projects/project-3.png" alt="" loading="lazy"></div>
+      <div class="build-body"><div class="build-meta"><span class="pill pill-noai">Pre-AI</span><time>May 2023</time></div><h3>Movie — IMDB Clone</h3><p>Movie discovery site in vanilla JavaScript.</p></div>
+    </article>
+    <article class="build">
+      <div class="build-img" style="background-color:#4f4f59"><img src="images/projects/project-5.png" alt="" loading="lazy"></div>
+      <div class="build-body"><div class="build-meta"><span class="pill pill-robotics">Robotics</span><time>Apr 2022</time></div><h3>AGV Maze Solver</h3><p>Browser maze solver for an automated-guided-vehicle concept — explores 40,344 solving approaches.</p></div>
+    </article>
+    <article class="build">
+      <div class="build-img" style="background-color:#ffb531"><img src="images/projects/project-6.png" alt="" loading="lazy"></div>
+      <div class="build-body"><div class="build-meta"><span class="pill pill-noai">Pre-AI</span><time>Dec 2022</time></div><h3>Timer Website</h3><p>A focused timer web app.</p></div>
+    </article>
+    <article class="build build--wide">
+      <div class="build-img" style="background-color:#5d6e80"><img src="images/projects/project-7.png" alt="" loading="lazy"></div>
+      <div class="build-body"><div class="build-meta"><span class="pill pill-a11y"><svg class="icon"><use href="#i-volume"/></svg>Accessibility</span><time>Dec 2020</time></div><h3>Speaking Website</h3><p>My first build: a page that <strong class="em">speaks its content aloud</strong>, made with visually impaired visitors in mind.</p></div>
+    </article>
+  </div>
+</section>
+
+<!-- ============ IMPACT (bento) ============ -->
+<section class="section achievements wash-alt">
+  <span class="deco-ring dr-b" aria-hidden="true"></span><span class="deco-dots dd-b" aria-hidden="true"></span>
+  <div class="impact-grid">
+    <div class="impact-head">
+      <p class="eyebrow eyebrow-line"><span class="eyebrow-n">04</span>Impact</p>
+      <h2>Delivery makes it <span class="scribble"><span class="accent-text">real.</span><svg viewBox="0 0 200 20" preserveAspectRatio="none" aria-hidden="true"><path d="M3 12 C 60 4, 140 4, 197 12"/></svg></span></h2>
+      <p class="section-sub">Numbers I'm proud of — earned with teams and customers, not alone.</p>
+    </div>
+    <div class="ach-stat ach-feature">
+      <span class="icon-tile tile-2"><svg class="icon"><use href="#i-clock"/></svg></span>
+      <strong>6–8 wks <svg class="icon icon-inline"><use href="#i-arrow-right"/></svg> ~2 days</strong>
+      <span>Dev + QA time for supported integrations</span>
+      <p class="ach-note">Customer UAT stays separate and can take several weeks.</p>
+    </div>
+    <div class="ach-stat"><span class="icon-tile tile-4"><svg class="icon"><use href="#i-layers"/></svg></span><strong><span class="num" data-to="110">110</span>+</strong><span>Reusable products shipped</span></div>
+    <div class="ach-stat"><span class="icon-tile tile-2"><svg class="icon"><use href="#i-briefcase"/></svg></span><strong><span class="num" data-to="70">70</span>+</strong><span>Customers handled</span></div>
+    <div class="ach-stat"><span class="icon-tile"><svg class="icon"><use href="#i-users"/></svg></span><strong><span class="num" data-to="25">25</span>+</strong><span>Colleagues trained</span></div>
+    <div class="ach-stat"><span class="icon-tile tile-3"><svg class="icon"><use href="#i-handshake"/></svg></span><strong><span class="num" data-to="10">10</span>+</strong><span>Customers helped retain</span></div>
+  </div>
+</section>
+
+<!-- ============ JOURNEY (horizontal timeline) ============ -->
+<section class="section hsection experience wash-alt" id="experience">
+  <div class="section-head">
+    <p class="eyebrow"><span class="eyebrow-n">05</span>My journey</p>
+    <h2>From one connection to <span class="accent-text">entire systems.</span></h2>
+  </div>
+  <div class="hscroll-pin" id="timelinePin">
+    <div class="hscroll-track timeline-track" id="timelineTrack">
+
+      <article class="card timeline-card">
+        <div class="card-top"><span class="icon-tile tile-3"><svg class="icon"><use href="#i-cap"/></svg></span><span class="card-tag">2016 – 2018</span></div>
+        <h3>Diploma, Electronics &amp; Robotics Engineering</h3>
+        <p>Swamy Abhedhanandha Polytechnic College (S.A.P.T.C), Thellar</p>
+      </article>
+
+      <article class="card timeline-card">
+        <div class="card-top"><span class="icon-tile tile-3"><svg class="icon"><use href="#i-cap"/></svg></span><span class="card-tag">2018 – 2021</span></div>
+        <h3>B.E. Mechatronics Engineering</h3>
+        <p>Rajalakshmi Engineering College, Chennai</p>
+        <p class="score"><strong>CGPA 8.7</strong></p>
+      </article>
+
+      <article class="card timeline-card">
+        <div class="card-top"><span class="icon-tile"><svg class="icon"><use href="#i-briefcase"/></svg></span><span class="card-tag">May 2021 – Dec 2024</span></div>
+        <h3>Integration Developer, TCS</h3>
+        <p>Migrated legacy <strong class="em">IBM IIB interfaces to Dell Boomi</strong> and built new complex integrations — requirements through deployment and support.</p>
+      </article>
+
+      <article class="card timeline-card">
+        <div class="card-top"><span class="icon-tile tile-4"><svg class="icon"><use href="#i-book"/></svg></span><span class="card-tag">2022 – 2023</span></div>
+        <h3>Full Stack MERN, Coding Ninjas</h3>
+        <p>Career Camp alongside work — Node.js, React, Express, MongoDB, DSA in Python. <strong class="em">Top Performer</strong> in four courses.</p>
+      </article>
+
+      <article class="card timeline-card">
+        <div class="card-top"><span class="icon-tile"><svg class="icon"><use href="#i-briefcase"/></svg></span><span class="card-tag">Dec 2024</span></div>
+        <h3>MTS-2, Aquera</h3>
+        <p>IAM, HR systems and directory connectors; OpenAPI-driven integration work.</p>
+      </article>
+
+      <article class="card timeline-card timeline-card--now">
+        <div class="card-top"><span class="icon-tile tile-2"><svg class="icon"><use href="#i-rocket"/></svg></span><span class="card-tag tag-hot"><span class="dot-live"></span>Jan 2026 – Present</span></div>
+        <h3>MTS-3 / Senior Software Developer, Aquera</h3>
+        <p>System integrations and automations across <strong class="em">ADP, Dayforce, Workday, Jira, ServiceNow, Entra ID and AD</strong> — plus engine improvements, customer delivery and mentoring.</p>
+      </article>
+
+      <div class="hscroll-end">Still building.<span>Keep scrolling <svg class="icon"><use href="#i-arrow-right"/></svg></span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CERTIFICATIONS ============ -->
+<section class="section certs wash" id="certifications">
+  <div class="section-head">
+    <p class="eyebrow"><span class="eyebrow-n">06</span>Certifications</p>
+    <h2>Learning, <span class="accent-text">certified.</span></h2>
+    <p class="section-sub">Coding Ninjas Career Camp — each one a <span class="mark">Certificate of Excellence, Top Performer</span>.</p>
+  </div>
+  <div class="certs-grid">
+    <button class="cert" type="button" data-cert="images/certs/BackEndNodeJs.png">
+      <div class="cert-img" role="img" aria-label="Coding Ninjas certificate — Back End, Full Stack Web Development in Node.js" style="background-image:url(images/certs/BackEndNodeJs.png)"><span class="cert-shield"></span><span class="cert-zoom"><svg class="icon"><use href="#i-search"/></svg>View</span></div>
+      <div class="cert-body"><span class="pill pill-gold"><svg class="icon"><use href="#i-star"/></svg>Top Performer</span><h3>Back End — Node.js</h3><p>Full Stack Web Development</p></div>
+    </button>
+    <button class="cert" type="button" data-cert="images/certs/FrontEnd.png">
+      <div class="cert-img" role="img" aria-label="Coding Ninjas certificate — Front End, Full Stack Web Development" style="background-image:url(images/certs/FrontEnd.png)"><span class="cert-shield"></span><span class="cert-zoom"><svg class="icon"><use href="#i-search"/></svg>View</span></div>
+      <div class="cert-body"><span class="pill pill-gold"><svg class="icon"><use href="#i-star"/></svg>Top Performer</span><h3>Front End</h3><p>Full Stack Web Development</p></div>
+    </button>
+    <button class="cert" type="button" data-cert="images/certs/DataStructurePython.png">
+      <div class="cert-img" role="img" aria-label="Coding Ninjas certificate — Data Structures in Python" style="background-image:url(images/certs/DataStructurePython.png)"><span class="cert-shield"></span><span class="cert-zoom"><svg class="icon"><use href="#i-search"/></svg>View</span></div>
+      <div class="cert-body"><span class="pill pill-gold"><svg class="icon"><use href="#i-star"/></svg>Top Performer</span><h3>Data Structures</h3><p>in Python</p></div>
+    </button>
+    <button class="cert" type="button" data-cert="images/certs/Python.png">
+      <div class="cert-img" role="img" aria-label="Coding Ninjas certificate — Introduction to Python" style="background-image:url(images/certs/Python.png)"><span class="cert-shield"></span><span class="cert-zoom"><svg class="icon"><use href="#i-search"/></svg>View</span></div>
+      <div class="cert-body"><span class="pill pill-gold"><svg class="icon"><use href="#i-star"/></svg>Top Performer</span><h3>Introduction to Python</h3><p>Foundations</p></div>
+    </button>
+  </div>
+</section>
+
+<!-- ============ CORE SKILLS ============ -->
+<section class="section core-skills wash" id="core-skills">
+  <span class="deco-dots dd-a" aria-hidden="true"></span>
+  <div class="section-head section-head--center">
+    <p class="eyebrow eyebrow-line"><span class="eyebrow-n">07</span>Core skills</p>
+    <h2>What I'm <span class="scribble"><span class="accent-text">really good at.</span><svg viewBox="0 0 200 20" preserveAspectRatio="none" aria-hidden="true"><path d="M3 12 C 60 4, 140 4, 197 12"/></svg></span></h2>
+    <p class="section-sub">The strengths behind the tools — what teams and customers count on me for.</p>
+  </div>
+  <div class="skill-grid">
+    <article class="skill-card" style="--c:#6d28d9"><span class="sk-glass" aria-hidden="true"></span><svg class="sk-mark" aria-hidden="true"><use href="#i-plug"/></svg><span class="sk-icon"><svg class="icon"><use href="#i-plug"/></svg></span><h3>Integrations &amp; automation</h3><p>At <strong>Aquera</strong>: Node.js connectors and flow systems linking HR, ITSM and identity platforms — automated end to end.</p></article>
+    <article class="skill-card" style="--c:#2563eb"><span class="sk-glass" aria-hidden="true"></span><svg class="sk-mark" aria-hidden="true"><use href="#i-code"/></svg><span class="sk-icon"><svg class="icon"><use href="#i-code"/></svg></span><h3>Backend engineering</h3><p>Clean, maintainable Node.js and Express services.</p></article>
+    <article class="skill-card" style="--c:#0f9f8f"><span class="sk-glass" aria-hidden="true"></span><svg class="sk-mark" aria-hidden="true"><use href="#i-network"/></svg><span class="sk-icon"><svg class="icon"><use href="#i-network"/></svg></span><h3>System design</h3><p>Event-driven flows with retries, idempotency and graceful failure.</p></article>
+    <article class="skill-card" style="--c:#db2777"><span class="sk-glass" aria-hidden="true"></span><svg class="sk-mark" aria-hidden="true"><use href="#i-layers"/></svg><span class="sk-icon"><svg class="icon"><use href="#i-layers"/></svg></span><h3>API design</h3><p>OpenAPI-first contracts that other teams can build against.</p></article>
+    <article class="skill-card" style="--c:#7c3aed"><span class="sk-glass" aria-hidden="true"></span><svg class="sk-mark" aria-hidden="true"><use href="#i-bot"/></svg><span class="sk-icon"><svg class="icon"><use href="#i-bot"/></svg></span><h3>AI orchestration</h3><p>Specialised AI roles, coordinated and validated with human review.</p></article>
+    <article class="skill-card" style="--c:#ea580c"><span class="sk-glass" aria-hidden="true"></span><svg class="sk-mark" aria-hidden="true"><use href="#i-handshake"/></svg><span class="sk-icon"><svg class="icon"><use href="#i-handshake"/></svg></span><h3>Customer delivery</h3><p>From the first requirement call to a safe go-live.</p></article>
+    <article class="skill-card" style="--c:#dc2626"><span class="sk-glass" aria-hidden="true"></span><svg class="sk-mark" aria-hidden="true"><use href="#i-zap"/></svg><span class="sk-icon"><svg class="icon"><use href="#i-zap"/></svg></span><h3>Problem solving</h3><p>Calm, methodical debugging when production is on the line.</p></article>
+    <article class="skill-card" style="--c:#16a34a"><span class="sk-glass" aria-hidden="true"></span><svg class="sk-mark" aria-hidden="true"><use href="#i-users"/></svg><span class="sk-icon"><svg class="icon"><use href="#i-users"/></svg></span><h3>Mentoring</h3><p>Trained 25+ colleagues; I grow the people around me.</p></article>
+  </div>
+</section>
+
+<!-- ============ SKILLS ============ -->
+<section class="section skills wash-alt" id="skills">
+  <span class="deco-ring dr-c" aria-hidden="true"></span>
+  <div class="skills-layout">
+    <div class="skills-intro">
+      <p class="eyebrow eyebrow-line"><span class="eyebrow-n">08</span>Tools &amp; technologies</p>
+      <h2>The tools behind<br>the <span class="scribble"><span class="accent-text">connections.</span><svg viewBox="0 0 200 20" preserveAspectRatio="none" aria-hidden="true"><path d="M3 12 C 60 4, 140 4, 197 12"/></svg></span></h2>
+      <p class="section-sub">Mostly <span class="mark">system integrations and automations</span> — everything else in service of shipping.</p>
+      <p class="chips-legend"><span class="chip chip-core chip-mini">Highlighted</span> = what I use daily.</p>
+    </div>
+    <div class="chip-groups">
+        <div class="chip-group chip-group--wide" style="--c:#0891b2"><span class="step-bg" aria-hidden="true" style="background-image:url(images/skills/skill-2.jpg)"></span>
+          <span class="chip-group-label"><svg class="icon"><use href="#i-workflow"/></svg>Systems I integrate &amp; automate</span>
+          <div class="sys-rows">
+            <div class="sys-row"><span class="sys-k">HR systems</span><div class="chips"><span class="chip chip-core"><img src="icons/adp.svg" alt="">ADP Workforce Now <small>&amp; variants</small></span><span class="chip chip-core"><svg class="icon"><use href="#i-users"/></svg>Dayforce</span><span class="chip chip-core"><svg class="icon"><use href="#i-briefcase"/></svg>Workday</span></div></div>
+            <div class="sys-row"><span class="sys-k">ITSM</span><div class="chips"><span class="chip chip-core"><img src="icons/jira.svg" alt="">Jira</span><span class="chip chip-core"><svg class="icon"><use href="#i-layers"/></svg>ServiceNow</span><span class="chip"><img src="icons/zendesk.svg" alt="">Zendesk</span><span class="chip"><svg class="icon"><use href="#i-message"/></svg>Freshservice</span></div></div>
+            <div class="sys-row"><span class="sys-k">Identity &amp; files</span><div class="chips"><span class="chip chip-core"><svg class="icon"><use href="#i-shield"/></svg>Microsoft Entra ID</span><span class="chip chip-core"><svg class="icon"><use href="#i-network"/></svg>Active Directory</span><span class="chip"><svg class="icon"><use href="#i-send"/></svg>SFTP</span></div></div>
+          </div>
+        </div>
+        <div class="chip-group" style="--c:#6d28d9"><span class="step-bg" aria-hidden="true" style="background-image:url(images/skills/skill-1.jpg)"></span>
+          <span class="chip-group-label"><svg class="icon"><use href="#i-code"/></svg>Backend</span>
+          <div class="chips">
+            <span class="chip chip-core"><img src="icons/nodedotjs.svg" alt="">Node.js</span><span class="chip chip-core"><img src="icons/javascript.svg" alt="">JavaScript</span><span class="chip chip-core"><img src="icons/express.svg" alt="">Express</span><span class="chip"><img src="icons/python.svg" alt="">Python</span><span class="chip"><img src="icons/socketdotio.svg" alt="">Socket.IO</span><span class="chip"><img src="icons/passport.svg" alt="">Passport.js</span>
+          </div>
+        </div>
+        <div class="chip-group" style="--c:#db2777"><span class="step-bg" aria-hidden="true" style="background-image:url(images/skills/skill-2.jpg)"></span>
+          <span class="chip-group-label"><svg class="icon"><use href="#i-plug"/></svg>Integration</span>
+          <div class="chips">
+            <span class="chip chip-core"><img src="icons/boomi.png" alt="" class="round">Dell Boomi</span><span class="chip chip-core"><svg class="icon"><use href="#i-network"/></svg>Apigee</span><span class="chip chip-core"><img src="icons/openapiinitiative.svg" alt="">OpenAPI</span><span class="chip"><svg class="icon"><use href="#i-shield"/></svg>IAM</span><span class="chip"><svg class="icon"><use href="#i-users"/></svg>HR systems</span>
+          </div>
+        </div>
+        <div class="chip-group" style="--c:#2563eb"><span class="step-bg" aria-hidden="true" style="background-image:url(images/skills/skill-3.jpg)"></span>
+          <span class="chip-group-label"><svg class="icon"><use href="#i-layers"/></svg>Cloud &amp; data</span>
+          <div class="chips">
+            <span class="chip chip-core"><img src="icons/amazonwebservices.svg" alt="">AWS</span><span class="chip chip-core"><img src="icons/mongodb.svg" alt="">MongoDB</span><span class="chip"><img src="icons/firebase.svg" alt="">Firebase</span><span class="chip">NoSQL</span><span class="chip">DBMS</span><span class="chip">System design</span>
+          </div>
+        </div>
+        <div class="chip-group" style="--c:#ea580c"><span class="step-bg" aria-hidden="true" style="background-image:url(images/skills/skill-4.jpg)"></span>
+          <span class="chip-group-label"><svg class="icon"><use href="#i-pen"/></svg>Frontend</span>
+          <div class="chips">
+            <span class="chip chip-core"><img src="icons/react.svg" alt="">React</span><span class="chip">MERN</span><span class="chip"><img src="icons/jquery.svg" alt="">jQuery</span><span class="chip"><img src="icons/bootstrap.svg" alt="">Bootstrap</span><span class="chip"><img src="icons/sass.svg" alt="">Sass</span>
+          </div>
+        </div>
+        <div class="chip-group" style="--c:#0f9f8f"><span class="step-bg" aria-hidden="true" style="background-image:url(images/skills/skill-5.jpg)"></span>
+          <span class="chip-group-label"><svg class="icon"><use href="#i-bot"/></svg>AI</span>
+          <div class="chips">
+            <span class="chip chip-core"><svg class="icon"><use href="#i-workflow"/></svg>Orchestration</span><span class="chip"><svg class="icon"><use href="#i-check"/></svg>Validation</span><span class="chip"><svg class="icon"><use href="#i-chart"/></svg>Reporting</span>
+          </div>
+        </div>
+        <div class="chip-group" style="--c:#16a34a"><span class="step-bg" aria-hidden="true" style="background-image:url(images/skills/skill-6.jpg)"></span>
+          <span class="chip-group-label"><svg class="icon"><use href="#i-sparkles"/></svg>Tools</span>
+          <div class="chips">
+            <span class="chip"><img src="icons/git.svg" alt="">Git</span><span class="chip"><img src="icons/github.svg" alt="">GitHub</span><span class="chip"><img src="icons/postman.svg" alt="">Postman</span><span class="chip"><img src="icons/npm.svg" alt="">npm</span><span class="chip"><img src="icons/render.svg" alt="">Render</span><span class="chip"><img src="icons/mongodb.svg" alt="">Studio 3T / Compass</span>
+          </div>
+        </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ HOW I WORK ============ -->
+<section class="section process wash" id="process">
+  <span class="deco-dots dd-c" aria-hidden="true"></span>
+  <div class="section-head section-head--center">
+    <p class="eyebrow eyebrow-line"><span class="eyebrow-n">09</span>How I work</p>
+    <h2>From requirement<br>to <span class="accent-text">real world.</span></h2>
+  </div>
+  <ol class="process-row">
+    <li style="--c:#6d28d9"><span class="step-bg" aria-hidden="true" style="background-image:url(images/how/step-1.jpg)"></span><span class="step-icon"><svg class="icon"><use href="#i-search"/></svg></span><div><span class="step-n">01</span><strong>Understand</strong><p>Clarify the problem and the people behind it.</p></div></li>
+    <li style="--c:#db2777"><span class="step-bg" aria-hidden="true" style="background-image:url(images/how/step-2.jpg)"></span><span class="step-icon"><svg class="icon"><use href="#i-pen"/></svg></span><div><span class="step-n">02</span><strong>Design</strong><p>Plan the approach before writing a line.</p></div></li>
+    <li style="--c:#2563eb"><span class="step-bg" aria-hidden="true" style="background-image:url(images/how/step-3.jpg)"></span><span class="step-icon"><svg class="icon"><use href="#i-code"/></svg></span><div><span class="step-n">03</span><strong>Build</strong><p>Create and orchestrate — reusable first.</p></div></li>
+    <li style="--c:#0f9f8f"><span class="step-bg" aria-hidden="true" style="background-image:url(images/how/step-4.jpg)"></span><span class="step-icon"><svg class="icon"><use href="#i-check"/></svg></span><div><span class="step-n">04</span><strong>Validate</strong><p>Evaluate, test and refine.</p></div></li>
+    <li style="--c:#ea580c"><span class="step-bg" aria-hidden="true" style="background-image:url(images/how/step-5.jpg)"></span><span class="step-icon"><svg class="icon"><use href="#i-rocket"/></svg></span><div><span class="step-n">05</span><strong>Implement</strong><p>Deploy with confidence, alongside the customer.</p></div></li>
+    <li style="--c:#16a34a"><span class="step-bg" aria-hidden="true" style="background-image:url(images/how/step-6.jpg)"></span><span class="step-icon"><svg class="icon"><use href="#i-chart"/></svg></span><div><span class="step-n">06</span><strong>Report</strong><p>Share the impact — honestly.</p></div></li>
+  </ol>
+</section>
+
+<!-- ============ MY WORK STYLE (Agile) ============ -->
+<section class="section workstyle wash-alt" id="workstyle">
+  <span class="deco-ring dr-b" aria-hidden="true"></span>
+  <div class="ws-top">
+    <div class="ws-head">
+      <p class="eyebrow eyebrow-line"><span class="eyebrow-n">10</span>My work style</p>
+      <h2>Agile, end to end —<br>and <span class="scribble"><span class="accent-text">accountable after go&#8209;live.</span><svg viewBox="0 0 200 20" preserveAspectRatio="none" aria-hidden="true"><path d="M3 12 C 60 4, 140 4, 197 12"/></svg></span></h2>
+      <p class="section-sub">For <span class="mark">5.5+ years</span> I've worked directly with customers — I go and talk to them, understand what they actually need, and stay with them until the product is <span class="mark">safely in use</span>.</p>
+    </div>
+    <div class="ws-stats">
+      <div class="ws-stat"><span class="icon-tile"><svg class="icon"><use href="#i-handshake"/></svg></span><strong><span class="num" data-to="5.5" data-dec="1">5.5</span>+</strong><span>Years handling customers directly</span></div>
+      <div class="ws-stat ws-stat--dark"><span class="icon-tile tile-4"><svg class="icon"><use href="#i-star"/></svg></span><strong><span class="num" data-to="4.6" data-dec="1">4.6</span><small>/5</small></strong><span class="ws-stars" aria-label="4.6 out of 5"><span style="width:92%"></span></span><span>Overall customer rating</span></div>
+      <div class="ws-stat"><span class="icon-tile tile-3"><svg class="icon"><use href="#i-trend"/></svg></span><strong><span class="num" data-to="70">70</span>+</strong><span>Customers served end to end — requirements to hypercare</span></div>
+      <div class="ws-stat"><span class="icon-tile tile-2"><svg class="icon"><use href="#i-shield"/></svg></span><strong><span class="num" data-to="2">2</span> wks</strong><span>Hypercare support after every go-live</span></div>
+    </div>
+  </div>
+  <ol class="ws-flow">
+      <li class="ws-step"><span class="ws-n">01</span><span class="ws-ico"><svg class="icon"><use href="#i-message"/></svg></span><strong>Talk to the customer</strong><p>I go and meet them — no long chains of hand-offs.</p></li>
+      <li class="ws-step"><span class="ws-n">02</span><span class="ws-ico"><svg class="icon"><use href="#i-search"/></svg></span><strong>Gather requirements</strong><p>Capture what they ask for, and why.</p></li>
+      <li class="ws-step"><span class="ws-n">03</span><span class="ws-ico"><svg class="icon"><use href="#i-users"/></svg></span><strong>Understand real needs</strong><p>Find the problem behind the request.</p></li>
+      <li class="ws-step"><span class="ws-n">04</span><span class="ws-ico"><svg class="icon"><use href="#i-workflow"/></svg></span><strong>Design system &amp; flow</strong><p>Plan the architecture and data flow first.</p></li>
+      <li class="ws-step"><span class="ws-n">05</span><span class="ws-ico"><svg class="icon"><use href="#i-code"/></svg></span><strong>Build</strong><p>Sprint by sprint, reusable first.</p></li>
+      <li class="ws-step"><span class="ws-n">06</span><span class="ws-ico"><svg class="icon"><use href="#i-check"/></svg></span><strong>Test</strong><p>Validate every path before release.</p></li>
+      <li class="ws-step"><span class="ws-n">07</span><span class="ws-ico"><svg class="icon"><use href="#i-rocket"/></svg></span><strong>Push to production</strong><p>Controlled, reversible deployments.</p></li>
+      <li class="ws-step"><span class="ws-n">08</span><span class="ws-ico"><svg class="icon"><use href="#i-send"/></svg></span><strong>Ship to the customer</strong><p>Hand over with clear documentation.</p></li>
+      <li class="ws-step"><span class="ws-n">09</span><span class="ws-ico"><svg class="icon"><use href="#i-shield"/></svg></span><strong>Test on their instance</strong><p>Verified with safe limits on real data.</p></li>
+      <li class="ws-step ws-step--hot"><span class="ws-n">10</span><span class="ws-ico"><svg class="icon"><use href="#i-clock"/></svg></span><strong>2-week hypercare</strong><p>Close support while they settle in.</p></li>
+  </ol>
+  <div class="ws-own">
+    <span class="icon-tile tile-2"><svg class="icon"><use href="#i-repeat"/></svg></span>
+    <p><strong>I own it, start to finish.</strong> Any issue that comes up at any stage is mine to resolve — until the customer is using their product safely and confidently.</p>
+  </div>
+</section>
+
+<!-- ============ CONTACT ============ -->
+<section class="section contact wash" id="contact">
+  <div class="blob blob-b" aria-hidden="true"></div>
+  <div class="contact-grid">
+    <div class="contact-copy">
+      <p class="eyebrow"><span class="eyebrow-n">11</span>Let's connect</p>
+      <h2>Let's build something <span class="scribble"><span class="accent-text">meaningful.</span><svg viewBox="0 0 200 20" preserveAspectRatio="none" aria-hidden="true"><path d="M3 12 C 50 5, 135 4, 197 11"/></svg></span></h2>
+      <p class="section-sub">Open to <span class="mark">new opportunities</span>, interesting problems, or just connecting.</p>
+      <div class="contact-cards">
+        <a class="contact-card" style="--c:#ea4335" href="mailto:sachayanthan.v.1999@gmail.com"><span class="cc-glass" aria-hidden="true"></span><span class="cc-markwrap" aria-hidden="true"><svg class="cc-mark"><use href="#i-mail"/></svg></span><span class="icon-tile"><svg class="icon"><use href="#i-mail"/></svg></span><span><strong>Email</strong>sachayanthan.v.1999@gmail.com</span></a>
+        <a class="contact-card" style="--c:#0a66c2" href="https://www.linkedin.com/in/sachayanthan-v-jain-040838150/" target="_blank" rel="noopener"><span class="cc-glass" aria-hidden="true"></span><span class="cc-markwrap" aria-hidden="true"><svg class="cc-mark"><use href="#i-linkedin"/></svg></span><span class="icon-tile tile-li"><svg class="icon"><use href="#i-linkedin"/></svg></span><span><strong>LinkedIn</strong>Sachayanthan V</span></a>
+        <a class="contact-card" style="--c:#181717" href="https://github.com/Sachayanthan-V" target="_blank" rel="noopener"><span class="cc-glass" aria-hidden="true"></span><span class="cc-markwrap" aria-hidden="true"><svg class="cc-mark"><use href="#i-github"/></svg></span><span class="icon-tile tile-gh"><svg class="icon"><use href="#i-github"/></svg></span><span><strong>GitHub</strong>Sachayanthan-V</span></a>
+        <a class="contact-card" style="--c:#ffa116" href="https://leetcode.com/Sachin23/" target="_blank" rel="noopener"><span class="cc-glass" aria-hidden="true"></span><span class="cc-markwrap" aria-hidden="true"><img class="cc-mark" src="icons/leetcode.svg" alt=""></span><span class="icon-tile tile-img"><img src="icons/leetcode.svg" alt=""></span><span><strong>LeetCode</strong>Sachin23</span></a>
+        <a class="contact-card" style="--c:#1ba94c" href="https://www.hackerrank.com/Sachayanthan_V" target="_blank" rel="noopener"><span class="cc-glass" aria-hidden="true"></span><span class="cc-markwrap" aria-hidden="true"><img class="cc-mark" src="icons/hackerrank.svg" alt=""></span><span class="icon-tile tile-img"><img src="icons/hackerrank.svg" alt=""></span><span><strong>HackerRank</strong>Sachayanthan_V</span></a>
+        <a class="contact-card" style="--c:#e1306c" href="https://www.instagram.com/sachin_1999_20_01/" target="_blank" rel="noopener"><span class="cc-glass" aria-hidden="true"></span><span class="cc-markwrap" aria-hidden="true"><svg class="cc-mark"><use href="#i-instagram"/></svg></span><span class="icon-tile tile-ig"><svg class="icon"><use href="#i-instagram"/></svg></span><span><strong>Instagram</strong>sachin_1999_20_01</span></a>
+        <a class="contact-card" style="--c:#6d28d9" href="assets/Sachayanthan_V_Resume.pdf" download><span class="cc-glass" aria-hidden="true"></span><span class="cc-markwrap" aria-hidden="true"><svg class="cc-mark"><use href="#i-download"/></svg></span><span class="icon-tile tile-2"><svg class="icon"><use href="#i-download"/></svg></span><span><strong>Resume</strong>Download PDF</span></a>
+      </div>
+    </div>
+    <!-- Contact options: 3 tabs to compare (Book a call is the primary one) -->
+    <div class="connect-panel" id="connectPanel">
+      <div class="cp-tabs" role="tablist" aria-label="Ways to connect">
+        <button class="cp-tab is-on" role="tab" id="cpt-book" aria-controls="cpp-book" aria-selected="true"><svg class="icon"><use href="#i-clock"/></svg>Book a call</button>
+        <button class="cp-tab" role="tab" id="cpt-glance" aria-controls="cpp-glance" aria-selected="false" tabindex="-1"><svg class="icon"><use href="#i-briefcase"/></svg>At a glance</button>
+        <button class="cp-tab" role="tab" id="cpt-say" aria-controls="cpp-say" aria-selected="false" tabindex="-1"><svg class="icon"><use href="#i-trophy"/></svg>Recognition</button>
+      </div>
+
+      <!-- 1. Book a call. Set data-booking to your Calendly / Google Calendar link; until then it opens an email. -->
+      <div class="cp-pane" role="tabpanel" id="cpp-book" aria-labelledby="cpt-book">
+        <span class="icon-tile cp-big"><svg class="icon"><use href="#i-clock"/></svg></span>
+        <h3>Let's talk for 15 minutes</h3>
+        <p>Pick a time that suits you — a quick intro call about a role, a project, or a problem you're solving.</p>
+        <ul class="cp-list">
+          <li><svg class="icon"><use href="#i-check"/></svg>15–30 minute video call</li>
+          <li><svg class="icon"><use href="#i-check"/></svg>No preparation needed</li>
+          <li><svg class="icon"><use href="#i-check"/></svg>You'll get a calendar invite instantly</li>
+        </ul>
+        <a class="btn btn-primary btn-lg btn-block" id="bookBtn" data-booking="https://calendly.com/sachayanthan-v-1999/hire-me" href="mailto:sachayanthan.v.1999@gmail.com?subject=Let%27s%20schedule%20a%20call" target="_blank" rel="noopener">Book a call<svg class="icon"><use href="#i-arrow-up-right"/></svg></a>
+        <p class="cp-note" id="bookNote">Booking calendar coming soon — for now this opens an email.</p>
+      </div>
+
+      <!-- 2. At a glance -->
+      <div class="cp-pane" role="tabpanel" id="cpp-glance" aria-labelledby="cpt-glance" hidden>
+        <div class="glance-head">
+          <span class="icon-tile cp-big"><svg class="icon"><use href="#i-briefcase"/></svg></span>
+          <div><h3>Sachayanthan V</h3><p class="glance-role"><span class="dot-live"></span>MTS-3 · Senior Software Developer at Aquera</p></div>
+        </div>
+        <dl class="glance-grid">
+          <div class="glance-wide"><dt>Identity</dt><dd>Robotics Engineer × Software Developer × AI Builder</dd></div>
+          <div><dt>Specialization</dt><dd>AI Systems · Backend Engineering · Full-Stack Development</dd></div>
+          <div><dt>AI &amp; Robotics</dt><dd>Computer Vision · Hardware–Software Integration · Intelligent Automation</dd></div>
+          <div><dt>Recognition</dt><dd>1st Prize — Smart India Hackathon (National Level)</dd></div>
+          <div><dt>Delivery</dt><dd>70+ Customers Served · 4.6/5 Rating</dd></div>
+          <div class="glance-wide"><dt>Building next</dt><dd>AI Products · Robotics · Scalable Software</dd></div>
+        </dl>
+        <div class="glance-actions">
+          <button class="btn btn-primary" type="button" id="copyEmail" data-email="sachayanthan.v.1999@gmail.com"><svg class="icon"><use href="#i-mail"/></svg><span>Copy email</span></button>
+          <a class="btn btn-outline" href="assets/Sachayanthan_V_Resume.pdf" download><svg class="icon"><use href="#i-download"/></svg>Résumé</a>
+        </div>
+      </div>
+
+      <!-- 3. Recognition & impact: proof of what's been achieved -->
+      <div class="cp-pane" role="tabpanel" id="cpp-say" aria-labelledby="cpt-say" hidden>
+        <h3>Recognition &amp; impact</h3>
+        <p>Proof of what I've achieved — on stage, beyond software, and with customers.</p>
+        <ul class="rec-list">
+          <li><span class="icon-tile"><svg class="icon"><use href="#i-trophy"/></svg></span><div><strong>National-level recognition</strong><span>1st Prize — Smart India Hackathon</span></div></li>
+          <li><span class="icon-tile"><svg class="icon"><use href="#i-cpu"/></svg></span><div><strong>Engineering beyond software</strong><span>AI, computer vision, robotics and hardware–software integration</span></div></li>
+          <li><span class="icon-tile"><svg class="icon"><use href="#i-users"/></svg></span><div><strong>Customer impact</strong><span>70+ customers served · 4.6/5 rating</span></div></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- certificate viewer: view-only (background image + shield layer, no download/copy/print) -->
+<div class="cert-modal" id="certModal" role="dialog" aria-modal="true" aria-label="Certificate" hidden>
+  <div class="cert-modal-backdrop" data-close></div>
+  <div class="cert-modal-panel">
+    <button class="cert-modal-close" type="button" data-close aria-label="Close"><svg class="icon"><use href="#i-x"/></svg></button>
+    <div class="cert-view" id="certView"><span class="cert-shield"></span><span class="cert-watermark" aria-hidden="true"></span></div>
+    <p class="cert-modal-title" id="certTitle"></p>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="footer-brand"><span class="nav-logo">SV<span>.</span></span><span>Sachayanthan V — MTS-3, Senior Software Developer at Aquera</span></div>
+  <div class="footer-social">
+    <a href="mailto:sachayanthan.v.1999@gmail.com" aria-label="Email"><svg class="icon"><use href="#i-mail"/></svg></a>
+    <a href="https://www.linkedin.com/in/sachayanthan-v-jain-040838150/" target="_blank" rel="noopener" aria-label="LinkedIn"><svg class="icon"><use href="#i-linkedin"/></svg></a>
+    <a href="https://github.com/Sachayanthan-V" target="_blank" rel="noopener" aria-label="GitHub"><svg class="icon"><use href="#i-github"/></svg></a>
+    <a href="https://www.instagram.com/sachin_1999_20_01/" target="_blank" rel="noopener" aria-label="Instagram"><svg class="icon"><use href="#i-instagram"/></svg></a>
+    <a href="#top" class="to-top" aria-label="Back to top"><svg class="icon"><use href="#i-arrow-up"/></svg></a>
+  </div>
+  <span class="footer-note">Engineer today. A brighter tomorrow.</span>
+</footer>
+
+<button class="skip-intro" id="skipIntro" type="button" hidden>Skip intro<svg class="icon"><use href="#i-arrow-right"/></svg></button>
+
+<script src="js/gsap.min.js"></script>
+<script src="js/ScrollTrigger.min.js"></script>
+<script src="js/lenis.min.js"></script>
+<script src="js/main.js?v=20261011"></script>
+</body>
+</html>

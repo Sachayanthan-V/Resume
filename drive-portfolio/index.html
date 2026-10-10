@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Sachayanthan V — Play mode</title>
+<meta name="description" content="An interactive 3D portfolio — drive around to explore.">
+<style>
+  :root { --bg:#0f1420; --panel:#ffffffee; --ink:#15131f; --muted:#5b5770; --accent:#7c3aed;
+    --grad:linear-gradient(120deg,#6d28d9,#a855f7 60%,#ec4899 130%); }
+  * { box-sizing:border-box; }
+  html,body { margin:0; height:100%; overflow:hidden; background:#bfe3ff;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color:var(--ink); }
+  #scene { position:fixed; inset:0; width:100%; height:100%; display:block; touch-action:none; }
+  #scene { cursor:grab; } #scene.looking { cursor:grabbing; }
+  .hidden { display:none !important; }
+  button { font:inherit; cursor:pointer; border:0; }
+
+  /* HUD */
+  #hud-top { position:fixed; top:14px; left:16px; right:200px; pointer-events:none; }
+  #hud-top h1 { margin:0; font-size:20px; letter-spacing:-.3px; color:#15131f; text-shadow:0 1px 0 #fff8; }
+  #hud-top h1::after { content:"."; color:#ec4899; }
+  #hud-top p { margin:2px 0 8px; font-size:13px; color:#33405a; }
+  .pill { display:inline-block; background:#ffffffcc; border-radius:999px; padding:4px 10px;
+    font-size:12px; margin-right:6px; font-weight:600; }
+  .pill-lap { background:var(--grad); color:#fff; font-variant-numeric:tabular-nums; }
+  #tools { position:fixed; top:236px; right:16px; display:flex; flex-direction:column; gap:6px; }
+  #tools button, #tools a { background:#ffffffd9; border-radius:10px; padding:7px 10px; font-size:12px; font-weight:700; color:#15131f; text-decoration:none; text-align:center; }
+  #tools .site { background:var(--grad); color:#fff; box-shadow:0 6px 16px #6d28d94d; }
+  #minimap { position:fixed; top:14px; right:16px; width:170px; height:170px; border-radius:14px;
+    background:#ffffffaa; box-shadow:0 4px 18px #0002; }
+  #speedo { position:fixed; right:18px; bottom:18px; background:#1d2433d9; color:#fff;
+    border-radius:14px; padding:8px 14px; text-align:right; min-width:104px; }
+  #speedo b { font-size:28px; font-variant-numeric:tabular-nums; }
+  #speedo small { display:block; font-size:11px; opacity:.7; }
+  #help { position:fixed; left:16px; bottom:16px; background:#ffffffcc; border-radius:12px;
+    padding:8px 12px; font-size:12px; line-height:1.6; }
+  kbd { background:#1d2433; color:#fff; border-radius:4px; padding:0 5px; font-size:11px; }
+  #prompt { position:fixed; left:50%; bottom:90px; transform:translateX(-50%); background:#1d2433e6;
+    color:#fff; padding:10px 16px; border-radius:12px; font-size:14px; }
+  #toast { position:fixed; left:50%; top:84px; transform:translateX(-50%); background:var(--grad); color:#fff;
+    padding:10px 18px; border-radius:12px; font-weight:700; box-shadow:0 6px 20px #0003; }
+
+  body.dark #hud-top h1 { color:#fff; text-shadow:0 1px 8px #0009; } body.dark #hud-top p { color:#d8dcf0; }
+  #fade { position:fixed; inset:0; background:#05030a; opacity:0; pointer-events:none; transition:opacity .5s ease; z-index:20; }
+  #fade.on { opacity:1; }
+
+  /* Garage */
+  #garage { position:fixed; left:16px; top:50%; transform:translateY(-50%); width:min(340px,calc(100% - 32px)); max-height:calc(100% - 32px); overflow:auto;
+    background:#ffffffee; backdrop-filter:blur(8px); border-radius:18px; padding:18px 18px 16px; box-shadow:0 18px 50px #0003; z-index:10; }
+  #garage h2 { margin:0; font-size:22px; } #garage h2::after { content:"."; color:#ec4899; }
+  #garage .sub { margin:2px 0 12px; font-size:13px; color:var(--muted); }
+  #garage h3 { margin:14px 0 8px; font-size:13px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); }
+  .g-cars { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .g-car { text-align:left; background:#f4f2fb; border:2px solid transparent; border-radius:12px; padding:9px 10px; color:var(--ink); }
+  .g-car b { display:block; font-size:14px; } .g-car span { font-size:11.5px; color:var(--muted); line-height:1.35; display:block; margin-top:2px; }
+  .g-car.on { border-color:#a855f7; background:#faf5ff; box-shadow:0 6px 16px #a855f733; }
+  .g-stats { display:grid; gap:6px; margin-top:12px; font-size:12px; font-weight:600; }
+  .g-stats div { display:grid; grid-template-columns:96px 1fr; align-items:center; gap:8px; }
+  .g-stats i { height:7px; border-radius:9px; background:#1d24331a; overflow:hidden; }
+  .g-stats em { display:block; height:100%; border-radius:9px; background:var(--grad); transition:width .3s ease; }
+  .g-pets { display:flex; gap:8px; } .g-pet { flex:1; background:#f4f2fb; border:2px solid transparent; border-radius:12px; padding:8px 6px; font-weight:700; font-size:13px; color:var(--ink); }
+  .g-pet.on { border-color:#a855f7; background:#faf5ff; }
+  .g-colors { display:flex; flex-wrap:wrap; gap:8px; }
+  .sw { width:32px; height:32px; border-radius:50%; border:3px solid #fff; box-shadow:0 0 0 1px #1d243333; cursor:pointer; padding:0; }
+  .sw.on { box-shadow:0 0 0 2px #a855f7; }
+  .sw.pick { background:conic-gradient(#e03131,#f59f00,#82c91e,#0ca678,#22d3ee,#5b5cf6,#ec4899,#e03131); position:relative; overflow:hidden; display:inline-block; }
+  .sw.pick input { position:absolute; inset:0; opacity:0; width:100%; height:100%; cursor:pointer; }
+  #garage .btns { margin:16px 0 0; justify-content:flex-start; }
+
+  /* Collapsible HUD: stats, settings and help open on demand (the map always stays) */
+  .hud-bar { display:flex; gap:6px; align-items:center; flex-wrap:wrap; margin-top:6px; pointer-events:auto; }
+  .hud-bar .pill { margin:0; }
+  .mini { width:32px; height:32px; border-radius:10px; background:#ffffffd9; color:#15131f; font-weight:900; font-size:15px; box-shadow:0 2px 10px #0002; display:inline-flex; align-items:center; justify-content:center; padding:0; }
+  .mini.on { background:var(--grad); color:#fff; }
+  #btn-help { font-family:Georgia, serif; font-style:italic; font-size:17px; }
+  #hud-stats { display:none; margin-top:6px; pointer-events:auto; }
+  body.show-stats #hud-stats { display:block; }
+  #hud-stats > .pill { margin:0 6px 6px 0; }
+  #lap { display:none; } body.show-stats #lap, body.lapping #lap { display:inline-block; }
+  #hud-btns { position:fixed; top:196px; right:16px; display:flex; gap:6px; }
+  #tools { display:none !important; } body.show-tools #tools { display:flex !important; }
+  #help { display:none; padding-right:34px; } body.show-help #help { display:block; }
+  #help .close { position:absolute; top:6px; right:6px; width:24px; height:24px; border-radius:50%; background:#1d24331a; font-size:15px; line-height:1; }
+  body.dark .mini:not(.on) { background:#ffffffcc; }
+
+  #caption { position:fixed; left:50%; bottom:118px; transform:translateX(-50%); width:min(720px,calc(100% - 32px)); background:#0f0d1ae6; color:#fff; border-radius:14px; padding:10px 12px 10px 14px; display:flex; gap:10px; align-items:center; font-size:15px; line-height:1.4; z-index:6; box-shadow:0 10px 30px #0004; }
+  #caption .mic { font-size:18px; } #caption-text { flex:1; }
+  #caption-skip { background:#ffffff22; color:#fff; border-radius:999px; padding:5px 10px; font-size:12px; font-weight:700; white-space:nowrap; }
+  #charge { position:fixed; left:50%; bottom:150px; transform:translateX(-50%); background:#1d2433e6; color:#fff; border-radius:999px; padding:6px 12px; display:flex; gap:8px; align-items:center; font-size:12px; font-weight:700; z-index:6; }
+  #charge i { width:140px; height:8px; border-radius:9px; background:#ffffff33; overflow:hidden; display:block; } #charge em { display:block; height:100%; width:0; background:linear-gradient(90deg,#82c91e,#fab005,#e03131); }
+
+  /* Island life: health, card balance, bag, shops */
+  .life { margin-top:6px; display:flex; flex-wrap:wrap; gap:6px; align-items:center; pointer-events:auto; }
+  .life .pill { margin:0; }
+  .foot { display:none !important; } body.onfoot .foot { display:inline-flex !important; }
+  .hp { align-items:center; gap:6px; }
+  .hp i { width:64px; height:7px; border-radius:9px; background:#1d24331f; overflow:hidden; display:inline-block; }
+  .hp em { display:block; height:100%; width:100%; border-radius:9px; background:linear-gradient(90deg,#2f9e44,#82c91e); transition:width .3s ease; }
+  .hp.low em { background:linear-gradient(90deg,#f59f00,#fab005); } .hp.low b { color:#c2410c; }
+  .hp.crit em { background:linear-gradient(90deg,#e03131,#ff6b6b); } .hp.crit { animation:hpPulse 1s ease-in-out infinite; }
+  @keyframes hpPulse { 50% { box-shadow:0 0 0 4px #e0313133; } }
+  .money { background:#ffffffe6; }
+  .pill-act { background:linear-gradient(120deg,#0ca678,#1c7ed6); color:#fff; }
+  #sheet .job { display:grid; grid-template-columns:1fr auto; gap:10px; align-items:center; background:#e6fcf5; border:1px solid #96f2d7; border-radius:12px; padding:10px 12px; margin:0 0 8px; }
+  #sheet .job.on { background:#fff9db; border-color:#ffe066; }
+  #sheet .job b { display:block; font-size:14px; } #sheet .job small { font-size:12px; color:var(--muted); }
+  #sheet .jobbtn { background:#0ca678; color:#fff; border-radius:999px; padding:7px 12px; font-weight:800; font-size:12.5px; }
+  #sheet .job.on .jobbtn { background:#e03131; }
+  .chip { background:#ffffffd9; border-radius:999px; padding:4px 10px; font-size:12px; font-weight:700; color:#15131f; align-items:center; gap:5px; }
+  .chip kbd { font-size:10px; padding:0 4px; }
+  #hurt { position:fixed; inset:0; pointer-events:none; opacity:0; z-index:5;
+    background:radial-gradient(ellipse at center, transparent 55%, #e0313155 80%, #c92a2aaa 100%); }
+  #sheet { position:fixed; left:16px; top:50%; transform:translateY(-50%); width:min(380px,calc(100% - 32px)); max-height:calc(100% - 32px); overflow:auto;
+    background:#ffffffee; backdrop-filter:blur(8px); border-radius:18px; padding:18px 18px 16px; box-shadow:0 18px 50px #0003; z-index:11; }
+  #sheet h2 { margin:0; font-size:21px; padding-right:36px; } #sheet .sub { margin:2px 0 12px; font-size:13px; color:var(--muted); }
+  #sheet h3 { margin:14px 0 6px; font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); }
+  #sheet .close { position:absolute; top:12px; right:12px; background:#1d24331a; border-radius:50%; width:32px; height:32px; font-size:18px; }
+  #sheet .row { display:grid; grid-template-columns:34px 1fr auto; gap:10px; align-items:center; padding:9px 0; border-bottom:1px solid #1d243312; }
+  #sheet .row .ie { font-size:24px; text-align:center; } #sheet .row b { font-size:14px; display:block; } #sheet .row b i { font-style:normal; color:var(--muted); font-weight:600; }
+  #sheet .row small { font-size:12px; color:var(--muted); }
+  #sheet .buy { background:var(--grad); color:#fff; border-radius:999px; padding:7px 14px; font-weight:800; font-size:13px; }
+  #sheet .buy:disabled { background:#ced4da; color:#fff; cursor:not-allowed; }
+  #sheet .keep { font-size:11px; color:var(--muted); font-weight:700; }
+  #sheet .owner { font-size:13.5px; background:#f4f2fb; border-radius:12px; padding:10px 12px; margin:0 0 6px; }
+  #sheet .pay { margin-top:12px; font-size:13px; background:#f8f9fa; border-radius:12px; padding:10px 12px; }
+  #sheet .tx { display:flex; justify-content:space-between; gap:10px; font-size:12.5px; padding:5px 0; border-bottom:1px dashed #1d24331a; }
+  #sheet .hpline { font-size:13px; font-weight:700; margin:10px 0 4px; color:#c2410c; }
+  .bankcard { position:relative; border-radius:16px; padding:16px 18px; color:#fff; aspect-ratio:1.7; display:flex; flex-direction:column; justify-content:space-between;
+    background:linear-gradient(135deg,#4c1d95,#7c3aed 45%,#db2777); box-shadow:0 14px 30px #6d28d94d; overflow:hidden; }
+  .bankcard::after { content:""; position:absolute; right:-40px; top:-40px; width:160px; height:160px; border-radius:50%; background:#ffffff1f; }
+  .bc-top { display:flex; justify-content:space-between; font-size:12px; letter-spacing:.12em; } .bc-top b { font-size:14px; }
+  .bc-chip { width:38px; height:28px; border-radius:6px; background:linear-gradient(135deg,#ffe8a3,#d4a24c); }
+  .bc-num { font-size:17px; letter-spacing:.12em; font-variant-numeric:tabular-nums; }
+  .bc-bot { display:flex; justify-content:space-between; font-size:11px; letter-spacing:.06em; align-items:flex-end; } .bc-bot b { font-size:16px; letter-spacing:0; }
+  @media (max-width:700px) { #sheet { top:auto; bottom:12px; transform:none; max-height:62%; } .chip kbd { display:none; } }
+
+  /* Section panel */
+  #panel { position:fixed; top:0; right:0; height:100%; width:min(440px,100%); background:var(--panel);
+    backdrop-filter: blur(6px); box-shadow:-10px 0 40px #0003; padding:28px 26px 40px; overflow:auto;
+    transform:translateX(105%); transition:transform .35s ease; }
+  #panel.open { transform:none; }
+  #panel h2 { margin:0 0 4px; font-size:28px; }
+  #panel .bar { height:5px; width:60px; border-radius:3px; margin-bottom:18px; }
+  #panel { --c:#7c3aed; }
+  #panel .close { position:absolute; top:16px; right:16px; background:#1d24331a; border-radius:50%;
+    width:34px; height:34px; font-size:18px; }
+  .content { font-size:15px; line-height:1.6; }
+  .content h4 { margin:16px 0 6px; }
+  .content a { color:var(--c,#7c3aed); font-weight:600; }
+  .chips { display:flex; flex-wrap:wrap; gap:6px; }
+  .chips span { background:#7c3aed0f; border:1px solid #7c3aed33; border-radius:999px; padding:3px 10px; font-size:13px; }
+  .card { background:#fff; border:1px solid #1d24331a; border-radius:12px; padding:12px 14px; margin:10px 0; }
+  .card h4 { margin:0 0 4px; }
+  .card .tag { display:inline-block; font-size:11px; font-weight:700; padding:2px 9px; border-radius:999px; margin-bottom:6px;
+    background:color-mix(in srgb, var(--c,#7c3aed) 14%, #fff); color:var(--c,#7c3aed); }
+  .stats { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin:14px 0; }
+  .stats div { background:#fff; border:1px solid #1d24331a; border-radius:12px; padding:10px 6px; text-align:center; }
+  .stats b { display:block; font-size:20px; background:var(--grad); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .stats span { font-size:11px; color:var(--muted); }
+  .steps { padding-left:22px; margin:10px 0; } .steps li { margin:3px 0; }
+  .note { font-size:13px; color:var(--muted); }
+  .cta { display:block; text-align:center; margin:14px 0; padding:12px; border-radius:12px; background:var(--grad); color:#fff !important; text-decoration:none; font-weight:800; }
+  .card p { margin:0 0 6px; }
+  .timeline > div { border-left:3px solid var(--c,#7c3aed); padding:4px 0 12px 12px; }
+  .links { list-style:none; padding:0; } .links li { margin:6px 0; }
+  .hint { margin-top:24px; font-size:12px; color:var(--muted); }
+
+  /* Intro + classic view */
+  .overlay { position:fixed; inset:0; background:radial-gradient(70% 70% at 70% 30%,#3b1d6ee6,transparent 70%),linear-gradient(160deg,#0e0b17f2,#15111fee);
+    color:#fff; display:flex; align-items:center; justify-content:center; padding:20px; }
+  .intro { max-width:560px; text-align:center; }
+  .intro h1 { font-size:clamp(30px,6vw,52px); margin:0 0 6px; letter-spacing:1px; }
+  .intro .role { display:inline-block; font-weight:700; margin:0 0 12px; padding:6px 14px; border-radius:999px; background:#a855f726; color:#e9d5ff; }
+  .intro p { color:#c9d1e3; }
+  .btns { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin:22px 0; }
+  .btn { padding:13px 24px; border-radius:999px; font-weight:800; font-size:16px; text-decoration:none; display:inline-block; }
+  .btn.primary { background:var(--grad); color:#fff; box-shadow:0 10px 26px #6d28d966; }
+  .btn.ghost { background:#ffffff1a; color:#fff; border:1px solid #ffffff40; }
+  .keys { font-size:13px; color:#aab4c8; line-height:1.9; }
+  .keys kbd { background:#ffffff22; }
+  #classic { overflow:auto; align-items:flex-start; background:#f6f7fb; color:var(--ink); }
+  #classic .wrap { max-width:760px; margin:0 auto; padding:30px 10px 60px; }
+  #classic header { display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; }
+  #classic section { background:#fff; border-radius:16px; padding:18px 22px; margin:16px 0; box-shadow:0 2px 12px #0000000d; }
+  #classic section h2 { margin:0 0 8px; }
+
+  /* Choice screen (after the loader): normal view or game view */
+  #intro { background:radial-gradient(60% 60% at 50% 45%,#f5f0ffe6,#fbfaffd9 75%); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); color:var(--ink); }
+  #intro .intro { max-width:680px; }
+  #intro .intro h1 { color:var(--ink); }
+  #intro .intro .role { background:#7c3aed14; color:#6d28d9; }
+  #intro .intro p { color:var(--muted); margin:0 0 6px; }
+  .ask { margin:26px 0 14px; font-size:12px; letter-spacing:.24em; text-transform:uppercase; color:var(--muted); font-weight:800; }
+  .choices { display:grid; grid-template-columns:1fr 1fr; gap:14px; text-align:left; }
+  .choice { display:flex; flex-direction:column; gap:6px; padding:20px 20px 18px; border-radius:18px; background:#fff; border:1px solid #1d24331a;
+    box-shadow:0 10px 30px #1d24330f; color:var(--ink); text-decoration:none; font:inherit; text-align:left; cursor:pointer; transition:transform .2s ease, box-shadow .2s ease; }
+  .choice:hover, .choice:focus-visible { transform:translateY(-3px); box-shadow:0 16px 36px #6d28d926; outline:none; }
+  .choice .ch-ico { font-size:26px; line-height:1; }
+  .choice b { font-size:19px; }
+  .choice span:not(.ch-ico) { font-size:13.5px; color:var(--muted); line-height:1.45; }
+  .choice em { margin-top:auto; padding-top:8px; font-style:normal; font-weight:800; font-size:13px; color:#6d28d9; }
+  .choice.game { background:var(--grad); color:#fff; border:0; box-shadow:0 14px 34px #6d28d94d; }
+  .choice.game span:not(.ch-ico), .choice.game em { color:#fff; }
+  .choice.game span:not(.ch-ico) { opacity:.9; }
+  #intro .keys { margin-top:18px; color:var(--muted); font-size:12.5px; }
+  #intro .keys kbd { background:#1d2433; color:#fff; }
+  @media (max-width:600px), (pointer:coarse) { #intro .keys { display:none; } }
+  @media (max-width:600px) { .choices { grid-template-columns:1fr; } .ask { margin-top:18px; } }
+
+  /* Loader (same as the website: particles gather into a ring as the page loads) */
+  html.is-loading, html.is-loading body { overflow:hidden; }
+  .loader { position:fixed; inset:0; z-index:1000; display:grid; place-items:center;
+    background:radial-gradient(60% 60% at 50% 50%, #f5f0ff, #fbfaff 70%); transition:opacity .7s ease, visibility .7s ease; }
+  .loader canvas { position:absolute; inset:0; }
+  .ld-center { position:relative; display:flex; flex-direction:column; align-items:center; gap:4px; }
+  .ld-pct { font-size:clamp(40px,6vw,64px); font-weight:900; letter-spacing:-0.04em; font-variant-numeric:tabular-nums;
+    background:var(--grad); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .ld-pct::after { content:"%"; font-size:.45em; margin-left:2px; }
+  .ld-label { font-size:11px; font-weight:700; letter-spacing:.3em; text-transform:uppercase; color:var(--muted); }
+  .loader.is-done .ld-center { animation:ldPulse .6s ease; }
+  @keyframes ldPulse { 50% { transform:scale(1.12); } }
+  .loader.is-out { opacity:0; visibility:hidden; }
+
+  /* Touch controls */
+  #touch { position:fixed; inset:auto 0 0 0; height:150px; pointer-events:none; }
+  #touch button { pointer-events:auto; position:absolute; width:70px; height:70px; border-radius:50%;
+    background:#1d243399; color:#fff; font-size:24px; font-weight:700; user-select:none; -webkit-user-select:none; touch-action:none; }
+  #touch button.on { background:#a855f7cc; }
+  @media (max-width:700px) {
+    #help { right:16px; bottom:170px; max-height:45vh; overflow:auto; font-size:11px; }
+    #minimap { width:120px; height:120px; }
+    #garage { top:auto; bottom:12px; transform:none; max-height:58%; padding:14px; } .g-car span { display:none; } body.garage #touch { display:none; }
+    #hud-btns { top:144px; } #tools { top:182px; } #tools button, #tools a { padding:5px 8px; font-size:11px; }
+    #hud-top { right:140px; } #hud-top h1 { font-size:16px; }
+    body.show-tools #speedo { display:none; }
+    #speedo { bottom:auto; top:182px; right:16px; min-width:0; padding:6px 10px; } #speedo b { font-size:20px; } #speedo small { display:none; }
+  }
+</style>
+</head>
+<body>
+<!-- loader: same particle ring as the website (shares ../Portfolio/js/loader.js) -->
+<div class="loader" id="loader" role="progressbar" aria-label="Loading" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+  <canvas id="loaderCanvas" aria-hidden="true"></canvas>
+  <div class="ld-center"><span class="ld-pct" id="ldPct">0</span><span class="ld-label">Loading</span></div>
+</div>
+<script src="../Portfolio/js/loader.js?v=20261011"></script>
+<canvas id="scene"></canvas>
+
+<div id="hud-top">
+  <h1 id="hud-name"></h1>
+  <p id="hud-role"></p>
+  <div class="hud-bar">
+    <button class="mini" id="btn-stats" title="Show / hide stats" aria-label="Show or hide stats">📊</button>
+    <span class="pill pill-lap" id="lap">Lap</span>
+    <span class="pill pill-act hidden" id="act"></span>
+  </div>
+  <div id="hud-stats">
+  <span class="pill" id="explored">Explored 0/0</span>
+  <span class="pill" id="stars">Stars 0/0</span>
+  <span class="pill" id="stunts">Stunts 0</span>
+  <div class="life">
+    <span class="pill hp foot" id="hp" title="Health"><span>❤</span><i><em></em></i><b>100</b></span>
+    <span class="pill money" id="money" title="Island Bank balance">💳 ₹1,000</span>
+    <button class="chip" id="btn-bag">👜 Bag <kbd>I</kbd></button>
+    <button class="chip foot" id="btn-sit">🪑 Sit <kbd>X</kbd></button>
+    <button class="chip foot" id="btn-lie">🛌 Lie down <kbd>Z</kbd></button>
+  </div>
+  </div>
+</div>
+<div id="hud-btns">
+  <button class="mini" id="btn-settings" title="Settings" aria-label="Settings">⚙</button>
+  <button class="mini" id="btn-help" title="How to play" aria-label="How to play">i</button>
+</div>
+<canvas id="minimap" width="340" height="340"></canvas>
+<div id="tools">
+  <a id="btn-classic" class="site" href="../Portfolio/index.html">Website mode ↗</a>
+  <button id="btn-garage">Garage</button>
+  <button id="btn-lights">💡 Lights: Auto</button>
+  <button id="btn-time">☀ Day</button>
+  <button id="btn-season">🍂 Autumn</button>
+  <button id="btn-weather">Weather: auto</button>
+  <button id="btn-cam">Camera: Chase</button>
+  <button id="btn-mute">Sound: on</button>
+</div>
+<div id="speedo"><b id="kmh">0</b> km/h<small id="boostlbl">Shift = boost</small></div>
+<div id="help">
+  <button class="close" id="help-close" aria-label="Close">×</button>
+  <kbd>W A S D</kbd> / arrows drive · <kbd>Shift</kbd> boost / run · <kbd>Space</kbd> drift / jump<br>
+  <kbd>Enter</kbd> open section · <kbd>G</kbd> garage · <kbd>N</kbd> day/night · <kbd>E</kbd> season · <kbd>Q</kbd> weather · <kbd>C</kbd> camera (incl. first person) · <kbd>R</kbd> reset · <kbd>M</kbd> mute · <kbd>H</kbd> this help<br>
+  <b>Drag</b> the mouse to look around · somewhere on this island hides a secret cave…<br>
+  On foot: walk up to a stall and press <kbd>Enter</kbd> to shop · <kbd>I</kbd> bag · <kbd>X</kbd> sit · <kbd>Z</kbd> lie down · <kbd>P</kbd> pet · <kbd>K</kbd> kite · hold <kbd>T</kbd> throw ball/frisbee · <kbd>L</kbd> lights · walk to START to race<br>
+  Sports ground (north-east): ⚽ run into the ball · 🏀 grab it, <kbd>Enter</kbd> to shoot · 🏏 cricket &amp; 🏸 beach badminton: <kbd>Space</kbd> to swing · 💪 gym · 💼 work at any shop (serve the queue with <kbd>Enter</kbd>)<br>
+  Hit <b>ramps</b> for air time · <b>boost pads</b> for speed · race the <b>outer ring</b> through the gates
+  <span style="opacity:.7">Voices by ElevenLabs</span>
+</div>
+<div id="prompt" class="hidden"></div>
+<div id="toast" class="hidden"></div>
+
+<aside id="panel" aria-live="polite">
+  <button class="close" id="panel-close" aria-label="Close">×</button>
+  <h2 id="panel-title"></h2>
+  <div class="bar" id="panel-bar"></div>
+  <div class="content" id="panel-body"></div>
+  <p class="hint">Press <kbd>Esc</kbd> or drive away to keep exploring.</p>
+</aside>
+
+<div id="garage" class="hidden" aria-label="Garage">
+  <h2>Garage</h2>
+  <p class="sub">Pick a ride and a paint — saved for next time.</p>
+  <div class="g-cars" id="g-cars"></div>
+  <div class="g-stats" id="g-stats"></div>
+  <h3>Pet (on foot)</h3>
+  <div class="g-pets" id="g-pets"></div>
+  <h3>Paint</h3>
+  <div class="g-colors" id="g-colors"></div>
+  <div class="btns"><button class="btn primary" id="g-done">Drive</button></div>
+</div>
+<div id="fade"></div>
+<div id="caption" class="hidden"><span class="mic">🎙</span><span id="caption-text"></span><button id="caption-skip" aria-label="Skip">Skip ✕</button></div>
+<div id="charge" class="hidden"><span>🥏 Power</span><i><em></em></i></div>
+<div id="hurt"></div>
+<div id="sheet" class="hidden" aria-live="polite">
+  <button class="close" id="sheet-close" aria-label="Close">×</button>
+  <h2 id="sheet-title"></h2>
+  <p class="sub" id="sheet-sub"></p>
+  <div id="sheet-body"></div>
+</div>
+
+<div id="touch" class="hidden">
+  <button data-k="left"  style="left:16px;bottom:30px">◀</button>
+  <button data-k="right" style="left:100px;bottom:30px">▶</button>
+  <button data-k="down"  style="right:100px;bottom:30px">▼</button>
+  <button data-k="up"    style="right:16px;bottom:30px">▲</button>
+  <button data-k="boost" style="right:16px;bottom:110px;font-size:14px">BOOST</button>
+  <button data-k="brake" style="right:100px;bottom:110px;font-size:12px">JUMP<br>DRIFT</button>
+  <button data-k="throw" style="right:184px;bottom:110px;font-size:12px">THROW</button>
+</div>
+
+<div id="intro" class="overlay">
+  <div class="intro">
+    <h1 id="intro-name"></h1>
+    <div class="role" id="intro-role"></div>
+    <p id="intro-tag"></p>
+    <h2 class="ask">How would you like to explore?</h2>
+    <div class="choices">
+      <a class="choice" id="btn-classic2" href="../Portfolio/index.html">
+        <span class="ch-ico" aria-hidden="true">📄</span><b>Normal view</b>
+        <span>The portfolio website — quick to read and easy to share.</span><em>Open the website →</em>
+      </a>
+      <button class="choice game" id="btn-start">
+        <span class="ch-ico" aria-hidden="true">🎮</span><b>Game view</b>
+        <span>Explore the island on foot — then swap to a car or a bike in the Garage.</span><em>Start exploring →</em>
+      </button>
+    </div>
+    <div class="keys">
+      <kbd>W A S D</kbd> / arrows move · <kbd>Shift</kbd> run · <kbd>Space</kbd> jump · <kbd>G</kbd> garage · <kbd>C</kbd> camera · drag to look around
+    </div>
+  </div>
+</div>
+
+<div id="classic" class="overlay hidden">
+  <div class="wrap">
+    <header>
+      <div><h1 id="classic-name" style="margin:0"></h1><div id="classic-role" style="color:#5b6475"></div></div>
+      <button class="btn primary" id="btn-back">Back to driving</button>
+    </header>
+    <div id="classic-sections"></div>
+  </div>
+</div>
+
+<script src="js/three.min.js"></script>
+<script src="js/data.js?v=20261011"></script>
+<script src="js/voices.js?v=20261011"></script>
+<script src="js/game.js?v=20261011"></script>
+</body>
+</html>

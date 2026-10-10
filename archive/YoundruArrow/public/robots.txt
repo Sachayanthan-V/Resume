@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://sachayanthan-v.github.io/Resume/sitemap.xml
