@@ -819,6 +819,11 @@ setTimeout(() => { // a beat later, so the loader can paint before the world is 
   const lampSpots = []; // park / street lamps in the neighbourhoods (instanced at the end, each with a pool of light)
   const lampPost = (x, z) => { lampSpots.push([x, z]); colliders.push({ x, z, r: 0.3 }); };
   const lampHeadMat = glowStd(0xffd08a, 0.15, 3);
+  // things under a stall lantern: they light up (emissive) after dark so you can see them
+  function litMat(c, night = 0.6) { const m = mat(c, { roughness: 0.6, emissive: c, emissiveIntensity: 0 }); nightGlow.push({ std: m, day: 0, night }); return m; }
+  function litHuman(h, night = 0.55) {
+    h.g.traverse((o) => { if (o.isMesh) { o.material = o.material.clone(); o.material.emissive = new THREE.Color(o.material.color).lerp(new THREE.Color(0xffd8a8), 0.35); o.material.emissiveIntensity = 0; nightGlow.push({ std: o.material, day: 0, night }); } });
+  }
 
   // ----- Market street (north): food stalls both sides, shops at the ends, lights strung across -----
   {
@@ -848,7 +853,7 @@ setTimeout(() => { // a beat later, so the loader can paint before the world is 
       const canopyM = new THREE.MeshStandardMaterial({ map: stripes, emissiveMap: stripes, emissive: 0xffffff, emissiveIntensity: 0, roughness: 0.8 }); nightGlow.push({ std: canopyM, day: 0, night: 0.55 });
       const canopy = add(new THREE.BoxGeometry(4.3, 0.08, 3.2), canopyM, 0, 2.85, 0.15, g); canopy.rotation.x = 0.22;
       const sign = add(new THREE.PlaneGeometry(3.4, 0.62), signMat(label(name, '#fff', col)), 0, 3.35, 1.62, g, false); sign.rotation.x = -0.08;
-      for (let k = 0; k < 9; k++) add(goodsGeo, mat(goodsCols[(k + i) % goodsCols.length], { roughness: 0.6 }), -1.4 + (k % 5) * 0.7 + rand(-0.1, 0.1), 1.2, 0.7 + Math.floor(k / 5) * 0.4, g, false);
+      for (let k = 0; k < 9; k++) add(goodsGeo, litMat(goodsCols[(k + i) % goodsCols.length], 0.9), -1.4 + (k % 5) * 0.7 + rand(-0.1, 0.1), 1.2, 0.7 + Math.floor(k / 5) * 0.4, g, false);
       add(new THREE.BoxGeometry(3.6, 0.9, 0.5), mat(0x6b4f35), 0, 0.45, -1.0, g, false);                           // back shelf
       colliders.push({ x: x - 1.2 * Math.cos(face), z, r: 1.9, shop: name }, { x: x + 1.2 * Math.cos(face), z, r: 1.9, shop: name });
       stallSpots.push({ x: x + Math.sin(face) * -0.1, z: z + Math.cos(face) * -0.1, face, line, name });
@@ -1774,8 +1779,8 @@ setTimeout(() => { // a beat later, so the loader can paint before the world is 
     bots.push(b); return b;
   }
   const spawnIn = (area, n) => { for (let i = 0; i < n; i++) { const b = { area, x: 0, z: 0 }; if (area.type === 'rect') { b.x = rand(area.x0, area.x1); b.z = rand(area.z0, area.z1); } else { const a = rand(0, 6.28), r = rand(area.r0, area.r1); b.x = area.cx + Math.cos(a) * r; b.z = area.cz + Math.sin(a) * r; } addBot({ mode: 'walk', ...b }); } };
-  for (const s of stallSpots) addBot({ mode: 'stand', x: s.x, z: s.z, face: s.face, line: s.line, shop: s.name });           // sellers
-  spawnIn(walkAreas.market, 16); spawnIn(walkAreas.park, 7); spawnIn(walkAreas.village, 6); spawnIn(walkAreas.plaza, 5);
+  for (const s of stallSpots) litHuman(addBot({ mode: 'stand', x: s.x, z: s.z, face: s.face, line: s.line, shop: s.name }).h);   // sellers (lit by their lantern)
+  spawnIn(walkAreas.market, 30); spawnIn(walkAreas.park, 7); spawnIn(walkAreas.village, 6); spawnIn(walkAreas.plaza, 5);
   const sitOn = (list, n, y) => { for (const s of list.filter(q => !q.used).sort(() => Math.random() - 0.5).slice(0, n)) { s.used = true; addBot({ mode: 'sit', x: s.x, z: s.z, face: s.face, y }); } };
   sitOn(benches.filter(b => b.tag === 'park'), 5, -0.4); sitOn(benches.filter(b => b.tag === 'view'), 4, -0.4); sitOn(benches.filter(b => b.tag === 'plaza'), 2, -0.4);
   sitOn(campSeats, 6, -0.55);
@@ -1845,7 +1850,7 @@ setTimeout(() => { // a beat later, so the loader can paint before the world is 
     puff: { n: 'Veg puff', e: '🥐', t: 'food', hold: 'bun', c: 0xe8a33d }, creambun: { n: 'Cream bun', e: '🧁', t: 'food', hold: 'bun', c: 0xfff0f6 }, cake: { n: 'Cake slice', e: '🍰', t: 'food', hold: 'box', c: 0xf783ac },
     pot: { n: 'Clay pot', e: '🏺', t: 'keep' }, mask: { n: 'Wooden mask', e: '🎭', t: 'keep' },
     tshirtPink: { n: 'Island T-shirt (pink)', e: '👕', t: 'shirt', c: '#ec4899' }, tshirtTeal: { n: 'Island T-shirt (teal)', e: '👕', t: 'shirt', c: '#0ca678' }, tshirtYellow: { n: 'Island T-shirt (yellow)', e: '👕', t: 'shirt', c: '#f59f00' },
-    water: { n: 'Water bottle', e: '💧', t: 'drink', hold: 'bottle', c: 0x74c0fc }, chips: { n: 'Chips', e: '🥔', t: 'food', hold: 'box', c: 0xffd43b }, choco: { n: 'Chocolate', e: '🍫', t: 'food', hold: 'box', c: 0x5c3d2e },
+    umbrella: { n: 'Umbrella', e: '☂️', t: 'umbrella' }, water: { n: 'Water bottle', e: '💧', t: 'drink', hold: 'bottle', c: 0x74c0fc }, chips: { n: 'Chips', e: '🥔', t: 'food', hold: 'box', c: 0xffd43b }, choco: { n: 'Chocolate', e: '🍫', t: 'food', hold: 'box', c: 0x5c3d2e },
     cappuccino: { n: 'Cappuccino', e: '☕', t: 'drink', hold: 'glass', c: 0xd9b48a }, sandwich: { n: 'Sandwich', e: '🥪', t: 'food', hold: 'box', c: 0xf1e3c6 },
     greentea: { n: 'Green tea', e: '🍵', t: 'drink', hold: 'glass', c: 0xa9e34b }, samosa: { n: 'Samosa', e: '🥟', t: 'food', hold: 'bun', c: 0xd9a24c },
     medicine: { n: 'Medicine', e: '💊', t: 'med', heal: 100, d: 'Restores full health' }, bandage: { n: 'Bandage', e: '🩹', t: 'med', heal: 30, d: '+30 health' },
@@ -1855,11 +1860,11 @@ setTimeout(() => { // a beat later, so the loader can paint before the world is 
     'SPICES': [['masala', 120], ['pepper', 90]], 'ICE CREAM': [['kulfi', 40], ['icecream', 50]], 'JUICE': [['cane', 30], ['limesoda', 35]],
     'BIRYANI': [['biryani', 180], ['vegbiryani', 140]], 'BOOKS': [['novel', 150], ['comic', 80]], 'TOYS': [['kite', 60], ['top', 40], ['ball', 40], ['frisbee', 80]],
     'FLOWERS': [['jasmine', 30], ['roses', 120]], 'PANI PURI': [['panipuri', 40], ['bhel', 50]], 'FILTER COFFEE': [['coffee', 30], ['badam', 40]],
-    'BAKERY': [['puff', 25], ['creambun', 20], ['cake', 60]], 'CRAFTS': [['pot', 200], ['mask', 450]], 'CLOTHES': [['tshirtPink', 350], ['tshirtTeal', 350], ['tshirtYellow', 350]],
-    'GROCERY': [['water', 20], ['chips', 20], ['choco', 40]], 'CAFÉ': [['cappuccino', 120], ['sandwich', 150], ['cake', 90]], 'TEA HOUSE': [['greentea', 60], ['masalachai', 30], ['samosa', 20]],
+    'BAKERY': [['puff', 25], ['creambun', 20], ['cake', 60]], 'CRAFTS': [['pot', 200], ['mask', 450]], 'CLOTHES': [['umbrella', 180], ['tshirtPink', 350], ['tshirtTeal', 350], ['tshirtYellow', 350]],
+    'GROCERY': [['water', 20], ['chips', 20], ['choco', 40], ['umbrella', 150]], 'CAFÉ': [['cappuccino', 120], ['sandwich', 150], ['cake', 90]], 'TEA HOUSE': [['greentea', 60], ['masalachai', 30], ['samosa', 20]],
     'PHARMACY': [['medicine', 150], ['bandage', 50]],
   };
-  const TYPE_LABEL = { food: 'Food · eat it', drink: 'Drink · drink it', med: 'Medicine · apply it', shirt: 'Clothing · wear it', keep: 'Souvenir · keep it', throw: 'Hold T to throw — play fetch with your dog', toy: 'Toy · play with it (it stays in your bag)' };
+  const TYPE_LABEL = { food: 'Food · eat it', drink: 'Drink · drink it', med: 'Medicine · apply it', shirt: 'Clothing · wear it', keep: 'Souvenir · keep it', throw: 'Hold T to throw — your dog fetches, your cat plays', umbrella: 'Press U (or Open) to use it in rain or snow', toy: 'Toy · play with it (it stays in your bag)' };
   const START_BALANCE = 1000;
   const LIFE = { bal: START_BALANCE, bag: {}, hp: 100, tx: [] };
   try { Object.assign(LIFE, JSON.parse(localStorage.getItem('drive-life-v2') || '{}')); } catch { /* fresh account */ }
@@ -1927,7 +1932,7 @@ setTimeout(() => { // a beat later, so the loader can paint before the world is 
   function openBag() {
     const ids = Object.keys(LIFE.bag).filter((id) => LIFE.bag[id] > 0 && ITEMS[id]);
     const verb = { food: 'Eat', drink: 'Drink', med: 'Apply', shirt: 'Wear', toy: '' };
-    const verbFor = (id, it) => (it.t === 'throw' ? 'Use' : it.t === 'toy' ? (id === 'kite' ? (kite.on ? 'Reel in' : 'Fly') : 'Spin') : verb[it.t]);
+    const verbFor = (id, it) => (it.t === 'umbrella' ? (umbrellaOn ? 'Close' : 'Open') : it.t === 'throw' ? 'Use' : it.t === 'toy' ? (id === 'kite' ? (kite.on ? 'Reel in' : 'Fly') : 'Spin') : verb[it.t]);
     const rows = ids.length ? ids.map((id) => { const it = ITEMS[id];
       return `<div class="row"><span class="ie">${it.e}</span><div><b>${it.n} <i>×${LIFE.bag[id]}</i></b><small>${it.d || TYPE_LABEL[it.t]}</small></div>${verbFor(id, it) ? `<button class="buy use" data-id="${id}">${verbFor(id, it)}</button>` : '<span class="keep">Souvenir</span>'}</div>`; }).join('')
       : '<p class="owner">Your bag is empty — visit Market Street to shop.</p>';
@@ -1956,6 +1961,7 @@ setTimeout(() => { // a beat later, so the loader can paint before the world is 
   };
   function useItem(id) {
     const it = ITEMS[id]; if (!it || !(LIFE.bag[id] > 0)) return;
+    if (it.t === 'umbrella') { closeSheet(); toggleUmbrella(); return; }
     if (it.t === 'throw') { closeSheet(); selectThrowable(id); return; }
     if (it.t === 'toy') { closeSheet(); if (id === 'kite') toggleKite(); else spinTop(); return; }
     if (it.t === 'shirt') { closeSheet(); setCar(carKind, it.c); toast(`${it.e} You're wearing the ${it.n}.`); return; }
@@ -2623,6 +2629,18 @@ setTimeout(() => { // a beat later, so the loader can paint before the world is 
     if (j.owner && j.owner.home) { Object.assign(j.owner, { x: j.owner.home.x, z: j.owner.home.z, face: j.owner.home.face, mode: 'stand', shopTo: null, buying: false, wait: 0 }); j.owner.home = null; poseHuman(j.owner.h, 0, 0); }
     if (!quiet) toast(`💼 Shift over at ${j.shop.name}: ${j.sales} sale${j.sales === 1 ? '' : 's'}, earned ${rupees(j.earned)}. The owner is back.`);
   }
+  let shopStreamT = 2;
+  function updateShoppers(dt) {        // every couple of seconds someone heads to a stall that has a short (or no) queue
+    if ((shopStreamT -= dt) > 0) return;
+    shopStreamT = rand(1.2, 2.6);
+    const free = bots.filter((b) => b.mode === 'walk' && !b.kid && !b.shopTo && !b.home && b.area === walkAreas.market);
+    const open = sellable.filter((s) => s.queue.length < 2 && (!JOB || s !== JOB.shop));
+    if (!free.length || !open.length) return;
+    const shop = pick(open);
+    let best = null, bd = Infinity;
+    for (const b of free) { const d = Math.hypot(b.x - shop.x, b.z - shop.z); if (d < bd) { bd = d; best = b; } }
+    if (best && bd < 70) sendShopping(best, shop);
+  }
   function updateJob(dt) {
     if (!JOB) return;
     if (!spec.human || underground || Math.hypot(S.x - JOB.shop.sx, S.z - JOB.shop.sz) > 2.4) { endJob(); return; }
@@ -3120,7 +3138,7 @@ setTimeout(() => { // a beat later, so the loader can paint before the world is 
     const h = model.userData.h; if (h) { h.armR.rotation.x = -2.2; }
     sfx(kind === 'frisbee' ? 'frisbee-throw' : 'ball-bounce', 0.6);
     if (pet.g && pet.kind === 'dog') { pet.fetch = { phase: 'chase' }; bark('dog-bark-happy'); }
-    else if (pet.kind === 'cat') toast('🐱 Cats don’t fetch… go and grab it yourself.');
+    else if (pet.g && pet.kind === 'cat') { pet.fetch = { phase: 'chase' }; meow(); }
   }
   function updateThrow(dt) {
     const can = spec.human && started && !sheetOpen && !panelOpen && !garageOpen && !ACT && !JOB && !S.pose && !race && !underground;
@@ -3158,7 +3176,7 @@ setTimeout(() => { // a beat later, so the loader can paint before the world is 
       // no dog fetching? walk over to it and you pick it up
       if (o.state === 'ground' && !(pet.fetch && pet.g && pet.g.visible) && Math.hypot(S.x - o.x, S.z - o.z) < 1.3) { o.m.visible = false; thrown = null; blip(660); return; }
     } else if (o.state === 'dog') {
-      const s3 = 1; o.x = pet.x + Math.sin(pet.h) * 0.48 * s3; o.z = pet.z + Math.cos(pet.h) * 0.48 * s3; o.y = 0.62 + (pet.y || 0);
+      const s3 = pet.kind === 'cat' ? 0.62 : 1; o.x = pet.x + Math.sin(pet.h) * 0.48 * s3; o.z = pet.z + Math.cos(pet.h) * 0.48 * s3; o.y = 0.62 * s3 + (pet.y || 0);
     }
     o.m.position.set(o.x, o.y, o.z);
   }
@@ -3166,19 +3184,69 @@ setTimeout(() => { // a beat later, so the loader can paint before the world is 
     const o = thrown, F = pet.fetch;
     if (!o || !pet.g || !pet.g.visible) { pet.fetch = null; return 0; }
     pet.y = Math.max(0, (pet.y || 0) - dt * 3);
+    const cat = pet.kind === 'cat';
+    if (F.phase === 'play') {            // the cat bats the ball around for a while before bringing it back
+      F.t -= dt;
+      const dx = o.x - pet.x, dz = o.z - pet.z, d = Math.hypot(dx, dz);
+      if (d > 0.45) { const v = Math.min(5.5, d * 4); pet.x += dx / d * v * dt; pet.z += dz / d * v * dt; pet.h = lerpAngle(pet.h, Math.atan2(dx, dz), dt * 10); }
+      else if ((F.bat -= dt) <= 0 && o.state === 'ground') {
+        F.bat = rand(0.6, 1.2); const a = rand(0, 6.28), p = rand(1.5, 3.2);
+        o.vx = Math.cos(a) * p; o.vz = Math.sin(a) * p; o.vy = rand(0.8, 2); o.state = 'air'; pet.y = 0.25; pet.barkAnim = 0.3;
+        if (Math.random() < 0.35) meow();
+      }
+      if (F.t <= 0 && o.state === 'ground' && d < 0.7) { o.state = 'dog'; F.phase = 'return'; toast('🐱 Your cat has had its fun — here it comes with the ball.'); }
+      return d > 0.45 ? 5.5 : 0;
+    }
     if (F.phase === 'chase') {
       const dx = o.x - pet.x, dz = o.z - pet.z, d = Math.hypot(dx, dz);
-      if (d > 0.4) { const v = Math.min(9.5, d * 4); pet.x += dx / d * v * dt; pet.z += dz / d * v * dt; pet.h = lerpAngle(pet.h, Math.atan2(dx, dz), dt * 10); }
-      if (o.state === 'air' && d < 1.1 && o.y < 1.8) { o.state = 'dog'; F.phase = 'return'; pet.y = 0.6; bark('dog-bark-happy'); toast('🐶 What a catch!'); }
-      else if (o.state === 'ground' && d < 0.7) { o.state = 'dog'; F.phase = 'return'; bark('dog-bark-1'); }
+      if (d > 0.4) { const v = Math.min(cat ? 7 : 9.5, d * 4); pet.x += dx / d * v * dt; pet.z += dz / d * v * dt; pet.h = lerpAngle(pet.h, Math.atan2(dx, dz), dt * 10); }
+      if (cat && o.state === 'ground' && d < 0.7) { F.phase = 'play'; F.t = rand(4, 6.5); F.bat = 0.3; toast('🐱 Your cat pounces on it and starts playing!'); meow(); }
+      else if (!cat && o.state === 'air' && d < 1.1 && o.y < 1.8) { o.state = 'dog'; F.phase = 'return'; pet.y = 0.6; bark('dog-bark-happy'); toast('🐶 What a catch!'); }
+      else if (!cat && o.state === 'ground' && d < 0.7) { o.state = 'dog'; F.phase = 'return'; bark('dog-bark-1'); }
       return d > 0.4 ? 9.5 : 0;
     }
     // bring it back and drop it at your feet
     const tx = S.x + Math.sin(S.h) * 1.1, tz = S.z + Math.cos(S.h) * 1.1, dx = tx - pet.x, dz = tz - pet.z, d = Math.hypot(dx, dz);
     if (d > 0.5) { const v = Math.min(8, d * 3); pet.x += dx / d * v * dt; pet.z += dz / d * v * dt; pet.h = lerpAngle(pet.h, Math.atan2(dx, dz), dt * 10); return v; }
     o.m.visible = false; thrown = null; pet.fetch = null;
-    toast(`🐶 Your dog brings the ${ITEMS[o.kind].n.toLowerCase()} back — good boy! Throw again with T.`); bark('dog-bark-2');
+    if (cat) { toast(`🐱 Your cat drops the ${ITEMS[o.kind].n.toLowerCase()} at your feet. Throw again with T.`); meow(); }
+    else { toast(`🐶 Your dog brings the ${ITEMS[o.kind].n.toLowerCase()} back — good boy! Throw again with T.`); bark('dog-bark-2'); }
     return 0;
+  }
+
+  // ---------- umbrellas: islanders open theirs when it rains or snows; buy one and press U ----------
+  const UMB_COLS = [0xe03131, 0x1c7ed6, 0xfab005, 0x2f9e44, 0x7048e8, 0xf06595, 0x212529];
+  function makeUmbrella(col) {
+    const g = new THREE.Group();
+    add(new THREE.CylinderGeometry(0.018, 0.018, 1.05, 6), mat(0x343a40), 0, 1.75, 0, g, false);
+    const canopy = add(new THREE.ConeGeometry(0.85, 0.32, 10, 1, true), new THREE.MeshStandardMaterial({ color: col, side: THREE.DoubleSide, roughness: 0.6 }), 0, 2.36, 0, g, false);
+    canopy.castShadow = true;
+    add(new THREE.SphereGeometry(0.03, 6, 4), mat(0x343a40), 0, 2.53, 0, g, false);
+    g.position.set(0.18, 0, 0.12); g.visible = false; return g;
+  }
+  let umbrellaOn = false, myUmbrella = null;
+  function toggleUmbrella() {
+    if (!(LIFE.bag.umbrella > 0)) { toast('☂️ Buy an umbrella at the GROCERY or CLOTHES shop first.'); return; }
+    if (!spec.human) { toast('Switch to On foot to use your umbrella.'); return; }
+    umbrellaOn = !umbrellaOn;
+    toast(umbrellaOn ? (W.show !== 'clear' && W.amt > 0.2 ? '☂️ Umbrella up — nice and dry!' : '☂️ Umbrella up (it isn’t even raining… stylish though).') : '☂️ Umbrella closed.');
+    blip(umbrellaOn ? 520 : 380);
+  }
+  function updateUmbrellas(dt) {
+    const wet = (W.show === 'rain' || W.show === 'snow') && W.amt > 0.3;
+    for (const b of bots) {
+      if (b.kid || b.mode === 'stand') continue;
+      if (b.umbPref === undefined) b.umbPref = Math.random() < 0.65;
+      const want = wet && b.umbPref && !b.shopTo;
+      if (want && !b.umb) { b.umb = makeUmbrella(pick(UMB_COLS)); b.h.g.add(b.umb); }
+      if (b.umb) { b.umb.visible = want; if (want) { b.h.armR.rotation.x = -1.75; b.h.armR.rotation.z = 0.25; } }
+    }
+    const h = model && model.userData.h;
+    if (!h) { umbrellaOn = umbrellaOn && spec.human; return; }
+    if (!myUmbrella || myUmbrella.parent !== h.g) { myUmbrella = makeUmbrella(0x7c3aed); h.g.add(myUmbrella); }
+    const show = umbrellaOn && !S.pose && !ACT && !S.act;
+    myUmbrella.visible = show;
+    if (show) { h.armR.rotation.x = -1.75; h.armR.rotation.z = 0.25; }
   }
 
   function updateFun(dt, now) {
@@ -3187,7 +3255,7 @@ setTimeout(() => { // a beat later, so the loader can paint before the world is 
     for (const b of bots) if (b.carry && (b.carryT -= dt) <= 0) { b.h.armL.remove(b.carry); b.carry = null; }
     if (!on) { if (ACT) quitAct(true); if (JOB) endJob(); if (bb.state === 'held') bb.state = 'free'; setActPill(null); return; }
     fb.inside = bb.inside = false;
-    updateThrow(dt);
+    updateThrow(dt); updateShoppers(dt); updateUmbrellas(dt);
     const near = (x, z, r = 140) => Math.hypot(S.x - x, S.z - z) < r;
     updateFlyers(t);
     if (near(FB.x, FB.z)) updateFootball(dt, t);
@@ -3279,6 +3347,7 @@ setTimeout(() => { // a beat later, so the loader can paint before the world is 
     if (e.code === 'KeyL') cycleLights();
     if (e.code === 'KeyP') cyclePet();
     if (e.code === 'KeyK') toggleKite();
+    if (e.code === 'KeyU') toggleUmbrella();
     if (e.code === 'KeyX') setPose('sit');
     if (e.code === 'KeyZ') setPose('lie');
     if (e.code === 'KeyN') skipTime();
@@ -4170,5 +4239,5 @@ setTimeout(() => { // a beat later, so the loader can paint before the world is 
     (window.siteReady || Promise.resolve()).then(() => $('#btn-start').click());
   }
   try { buildPet(petKind); } catch { petKind = 'none'; } // the saved pet joins once the player exists
-  window.__game = { SPORT, get ACT() { return ACT; }, get JOB() { return JOB; }, startJob, fb, bb, get nearAct() { return nearAct; }, toggleKite, spinTop, get kite() { return kite; }, setPet, startRace, cycleLights, get race() { return race; }, get pet() { return pet; }, runners, get lightMode() { return lightMode; }, get voices() { return voicePool.map(v => v.name + ' ' + v.lang); }, bots, benches, LIFE, hurt, openBag, openNearShop, setPose, get nearShop() { return nearShop; }, S, keys, zones, exhibits, setSeason, cycleWeather, W, get season() { return SEASONS[seasonIdx].key; }, start: () => $('#btn-start').click(), enterCave, leaveCave, skipTime, setCar, CAVE, DN, get underground() { return underground; } }; // handy for debugging
+  window.__game = { toggleUmbrella, get umbrellaOn() { return umbrellaOn; }, get thrown() { return thrown; },  SPORT, get ACT() { return ACT; }, get JOB() { return JOB; }, startJob, fb, bb, get nearAct() { return nearAct; }, toggleKite, spinTop, get kite() { return kite; }, setPet, startRace, cycleLights, get race() { return race; }, get pet() { return pet; }, runners, get lightMode() { return lightMode; }, get voices() { return voicePool.map(v => v.name + ' ' + v.lang); }, bots, benches, LIFE, hurt, openBag, openNearShop, setPose, get nearShop() { return nearShop; }, S, keys, zones, exhibits, setSeason, cycleWeather, W, get season() { return SEASONS[seasonIdx].key; }, start: () => $('#btn-start').click(), enterCave, leaveCave, skipTime, setCar, CAVE, DN, get underground() { return underground; } }; // handy for debugging
 }, 30);
