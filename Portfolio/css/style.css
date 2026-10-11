@@ -1410,3 +1410,12 @@ html.is-loading, html.is-loading body { overflow: hidden; }
   .pillar-ico { width: 28px; height: 28px; }
   .pillar-ico .icon { width: 15px; height: 15px; }
 }
+
+/* featured certificate (Aquera award): full-width horizontal card above the course certificates */
+.cert--feature { grid-column: 1 / -1; flex-direction: row; align-items: stretch; }
+.cert--feature .cert-img { flex: 0 0 46%; aspect-ratio: 1.5; border-bottom: 0; border-right: 1px solid var(--line); background-color: #fff; background-position: center; }
+.cert--feature .cert-body { display: flex; flex-direction: column; justify-content: center; padding: 28px 34px; }
+.cert--feature h3 { font-size: 22px; }
+.cert--feature .cert-body .pill { align-self: flex-start; }
+.cert--feature p { margin-top: 8px; line-height: 1.6; }
+@media (max-width: 700px) { .cert--feature { flex-direction: column; } .cert--feature .cert-img { flex-basis: auto; border-right: 0; border-bottom: 1px solid var(--line); } .cert--feature .cert-body { padding: 22px 24px 26px; } .cert--feature h3 { font-size: 18px; } }

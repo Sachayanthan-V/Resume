@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Caveat:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=20261012">
+<link rel="stylesheet" href="css/style.css?v=20261012b">
 <script>
   // theme before first paint (no flash): saved choice, else light (the default)
   try { var t = localStorage.getItem('theme'); if (!t) t = 'light'; document.documentElement.dataset.theme = t; } catch (e) {}
@@ -20,7 +20,7 @@
   <canvas id="loaderCanvas" aria-hidden="true"></canvas>
   <div class="ld-center"><span class="ld-pct" id="ldPct">0</span><span class="ld-label">Loading</span></div>
 </div>
-<script src="js/loader.js?v=20261011e"></script>
+<script src="js/loader.js?v=20261012b"></script>
 
 <!-- ============ ICON SPRITE (Lucide-style, MIT) ============ -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -86,7 +86,7 @@
       <svg class="icon i-moon"><use href="#i-moon"/></svg><svg class="icon i-sun"><use href="#i-sun"/></svg>
     </button>
     <a class="nav-play" href="../drive-portfolio/index.html?play&v=20261011e" title="Explore this portfolio as a drivable 3D world"><svg class="icon"><use href="#i-gamepad"/></svg>Play mode</a>
-    <a class="btn btn-primary btn-sm" href="assets/Sachayanthan_V_Resume.pdf" download><svg class="icon"><use href="#i-download"/></svg>Resume</a>
+    <a class="btn btn-primary btn-sm" href="assets/Sachayanthan_V_Resume.pdf?v=20261012b" download><svg class="icon"><use href="#i-download"/></svg>Resume</a>
   </div>
 </nav>
 
@@ -182,7 +182,7 @@
         <li><span class="pillar-ico ico-blue"><svg class="icon"><use href="#i-handshake"/></svg></span><span>Customer<small>delivery</small></span></li>
       </ul>
       <div class="about-actions">
-        <a href="assets/Sachayanthan_V_Resume.pdf" class="btn btn-primary btn-lg" download><svg class="icon"><use href="#i-download"/></svg>Download CV</a>
+        <a href="assets/Sachayanthan_V_Resume.pdf?v=20261012b" class="btn btn-primary btn-lg" download><svg class="icon"><use href="#i-download"/></svg>Download CV</a>
         <a href="#contact" class="btn btn-outline btn-lg">Hire me</a>
       </div>
     </div>
@@ -482,10 +482,14 @@
 <section class="section certs wash" id="certifications">
   <div class="section-head">
     <p class="eyebrow"><span class="eyebrow-n">06</span>Certifications</p>
-    <h2>Learning, <span class="accent-text">certified.</span></h2>
-    <p class="section-sub">Coding Ninjas Career Camp — each one a <span class="mark">Certificate of Excellence, Top Performer</span>.</p>
+    <h2>Recognised &amp; <span class="accent-text">certified.</span></h2>
+    <p class="section-sub">Recognised at work for <span class="mark">innovation</span> — and a Top Performer in every Coding Ninjas Career Camp course.</p>
   </div>
   <div class="certs-grid">
+    <button class="cert cert--feature" type="button" data-cert="images/certs/AqueraCertificate.jpeg">
+      <div class="cert-img" role="img" aria-label="Aquera Stars certificate — Innovation of the Quarter, presented to Sachayanthan V" style="background-image:url(images/certs/AqueraCertificate.jpeg)"><span class="cert-shield"></span><span class="cert-zoom"><svg class="icon"><use href="#i-search"/></svg>View</span></div>
+      <div class="cert-body"><span class="pill pill-gold"><svg class="icon"><use href="#i-trophy"/></svg>Aquera Stars</span><h3>Innovation of the Quarter</h3><p>Awarded by Aquera "in appreciation of outstanding contribution to the organisation" — with a certificate and a cash award. Presented by the VP Engineering &amp; MD India.</p></div>
+    </button>
     <button class="cert" type="button" data-cert="images/certs/BackEndNodeJs.png">
       <div class="cert-img" role="img" aria-label="Coding Ninjas certificate — Back End, Full Stack Web Development in Node.js" style="background-image:url(images/certs/BackEndNodeJs.png)"><span class="cert-shield"></span><span class="cert-zoom"><svg class="icon"><use href="#i-search"/></svg>View</span></div>
       <div class="cert-body"><span class="pill pill-gold"><svg class="icon"><use href="#i-star"/></svg>Top Performer</span><h3>Back End — Node.js</h3><p>Full Stack Web Development</p></div>
@@ -650,7 +654,7 @@
         <a class="contact-card" style="--c:#ffa116" href="https://leetcode.com/Sachin23/" target="_blank" rel="noopener"><span class="cc-glass" aria-hidden="true"></span><span class="cc-markwrap" aria-hidden="true"><img class="cc-mark" src="icons/leetcode.svg" alt=""></span><span class="icon-tile tile-img"><img src="icons/leetcode.svg" alt=""></span><span><strong>LeetCode</strong>Sachin23</span></a>
         <a class="contact-card" style="--c:#1ba94c" href="https://www.hackerrank.com/Sachayanthan_V" target="_blank" rel="noopener"><span class="cc-glass" aria-hidden="true"></span><span class="cc-markwrap" aria-hidden="true"><img class="cc-mark" src="icons/hackerrank.svg" alt=""></span><span class="icon-tile tile-img"><img src="icons/hackerrank.svg" alt=""></span><span><strong>HackerRank</strong>Sachayanthan_V</span></a>
         <a class="contact-card" style="--c:#e1306c" href="https://www.instagram.com/sachin_1999_20_01/" target="_blank" rel="noopener"><span class="cc-glass" aria-hidden="true"></span><span class="cc-markwrap" aria-hidden="true"><svg class="cc-mark"><use href="#i-instagram"/></svg></span><span class="icon-tile tile-ig"><svg class="icon"><use href="#i-instagram"/></svg></span><span><strong>Instagram</strong>sachin_1999_20_01</span></a>
-        <a class="contact-card" style="--c:#6d28d9" href="assets/Sachayanthan_V_Resume.pdf" download><span class="cc-glass" aria-hidden="true"></span><span class="cc-markwrap" aria-hidden="true"><svg class="cc-mark"><use href="#i-download"/></svg></span><span class="icon-tile tile-2"><svg class="icon"><use href="#i-download"/></svg></span><span><strong>Resume</strong>Download PDF</span></a>
+        <a class="contact-card" style="--c:#6d28d9" href="assets/Sachayanthan_V_Resume.pdf?v=20261012b" download><span class="cc-glass" aria-hidden="true"></span><span class="cc-markwrap" aria-hidden="true"><svg class="cc-mark"><use href="#i-download"/></svg></span><span class="icon-tile tile-2"><svg class="icon"><use href="#i-download"/></svg></span><span><strong>Resume</strong>Download PDF</span></a>
       </div>
     </div>
     <!-- Contact options: 3 tabs to compare (Book a call is the primary one) -->
@@ -685,13 +689,13 @@
           <div class="glance-wide"><dt>Identity</dt><dd>Robotics Engineer × Software Developer × AI Builder</dd></div>
           <div><dt>Specialization</dt><dd>AI Systems · Backend Engineering · Full-Stack Development</dd></div>
           <div><dt>AI &amp; Robotics</dt><dd>Computer Vision · Hardware–Software Integration · Intelligent Automation</dd></div>
-          <div><dt>Recognition</dt><dd>1st Prize — Smart India Hackathon (National Level)</dd></div>
+          <div><dt>Recognition</dt><dd>Innovation of the Quarter — Aquera Stars · 1st Prize — Smart India Hackathon</dd></div>
           <div><dt>Delivery</dt><dd>70+ Customers Served · 4.6/5 Rating</dd></div>
           <div class="glance-wide"><dt>Building next</dt><dd>AI Products · Robotics · Scalable Software</dd></div>
         </dl>
         <div class="glance-actions">
           <button class="btn btn-primary" type="button" id="copyEmail" data-email="sachayanthan.v.1999@gmail.com"><svg class="icon"><use href="#i-mail"/></svg><span>Copy email</span></button>
-          <a class="btn btn-outline" href="assets/Sachayanthan_V_Resume.pdf" download><svg class="icon"><use href="#i-download"/></svg>Résumé</a>
+          <a class="btn btn-outline" href="assets/Sachayanthan_V_Resume.pdf?v=20261012b" download><svg class="icon"><use href="#i-download"/></svg>Résumé</a>
         </div>
       </div>
 
@@ -700,6 +704,7 @@
         <h3>Recognition &amp; impact</h3>
         <p>Proof of what I've achieved — on stage, beyond software, and with customers.</p>
         <ul class="rec-list">
+          <li><span class="icon-tile"><svg class="icon"><use href="#i-star"/></svg></span><div><strong>Innovation of the Quarter</strong><span>Aquera Stars award — certificate and cash award for outstanding contribution</span></div></li>
           <li><span class="icon-tile"><svg class="icon"><use href="#i-trophy"/></svg></span><div><strong>National-level recognition</strong><span>1st Prize — Smart India Hackathon</span></div></li>
           <li><span class="icon-tile"><svg class="icon"><use href="#i-cpu"/></svg></span><div><strong>Engineering beyond software</strong><span>AI, computer vision, robotics and hardware–software integration</span></div></li>
           <li><span class="icon-tile"><svg class="icon"><use href="#i-users"/></svg></span><div><strong>Customer impact</strong><span>70+ customers served · 4.6/5 rating</span></div></li>
@@ -737,6 +742,6 @@
 <script src="js/gsap.min.js"></script>
 <script src="js/ScrollTrigger.min.js"></script>
 <script src="js/lenis.min.js"></script>
-<script src="js/main.js?v=20261012"></script>
+<script src="js/main.js?v=20261012b"></script>
 </body>
 </html>

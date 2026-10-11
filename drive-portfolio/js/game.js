@@ -267,6 +267,7 @@ setTimeout(() => { // a beat later, so the loader can paint before the world is 
   const inRiver = (x, z) => x > RIVER.x0 - 9 && x < RIVER.x1 && Math.abs(z) < RIVER.w / 2 && (x > RIVER.x0 || Math.hypot(x - RIVER.x0, z) < RIVER.w / 2);
   const waterMats = [];
   // mode 0: river (foam along |z - cz| = halfW), mode 1: round pool (foam at radius)
+  const WAVE_T = 6.5;   // seconds between waves (shared by the sea swells and the swash on the sand)
   function makeWater(o = {}) {
     const m = new THREE.ShaderMaterial({
       transparent: true, fog: true,
@@ -316,6 +317,15 @@ setTimeout(() => { // a beat later, so the loader can paint before the world is 
           vec3 r = reflect(-uSunDir, n);
           col += vec3(1.0, 0.95, 0.85) * pow(max(dot(r, v), 0.0), 160.0) * 2.2 * max(uLight, 0.35);
           float foam = smoothstep(0.82, 1.0, edge) * (0.55 + 0.45*sin(vXZ.x*1.3 + vXZ.y*0.7 + uTime*2.0 + n.x*20.0));
+          if (uMode > 1.5) {   // swells rolling in towards the island, breaking into foam in the shallows
+            float ang = atan(vXZ.y, vXZ.x), sd = length(vXZ) - shoreR(ang);
+            float band = fract(sd / 18.0 + uTime / ${WAVE_T.toFixed(1)} + 0.12 * sin(ang * 5.0));
+            float crest = smoothstep(0.0, 0.07, band) * (1.0 - smoothstep(0.07, 0.42, band));
+            float amp = smoothstep(80.0, 9.0, sd);
+            float brk = crest * smoothstep(34.0, 7.0, sd) * (0.6 + 0.4 * sin(vXZ.x * 2.1 + vXZ.y * 1.7 + uTime * 3.0));
+            col += uShallow * crest * amp * 0.35 * mix(0.3, 1.0, uLight);
+            foam = max(foam, brk * 0.9);
+          }
           col = mix(col, vec3(0.95,0.98,1.0) * mix(0.35, 1.0, uLight), foam*0.75);
           // frozen in winter: pale, glossy ice
           vec3 ice = mix(vec3(0.76, 0.86, 0.93), vec3(0.93, 0.97, 1.0), fres + 0.3 * sin(vXZ.x * 0.7 + vXZ.y * 1.3)) * mix(0.3, 1.0, uLight);
@@ -333,10 +343,48 @@ setTimeout(() => { // a beat later, so the loader can paint before the world is 
   const pond = add(new THREE.CircleGeometry(RIVER.w / 2, 48), waterMat, RIVER.x0, 0.24, 0, scene, false); pond.rotation.x = -Math.PI / 2;
   // beach all round the island, and the open sea beyond it
   const sandMat = mat(0xead9a6, { roughness: 1 });
-  add(ringShape(circlePts(460), shorePts(-3)), sandMat, 0, 0.012, 0, scene, false).rotation.x = -Math.PI / 2;
+  add(ringShape(circlePts(460), shorePts(-13)), sandMat, 0, 0.012, 0, scene, false).rotation.x = -Math.PI / 2;   // a proper, wide beach
   const seaMat = makeWater({ mode: 2, radius: 7, halfW: 80, lobes: true, deep: 0x0a3a5a, shallow: 0x3cb6c6, scale: 0.32 });
   seaMat.userData.noIce = true;
   add(ringShape(circlePts(2600, 128), shorePts(5)), seaMat, 0, 0.2, 0, scene, false).rotation.x = -Math.PI / 2;
+  // swash: each wave runs up the sand as a foamy edge, leaves it wet and darker, then slides back
+  const swashMat = new THREE.ShaderMaterial({
+    transparent: true, depthWrite: false, fog: true,
+    uniforms: THREE.UniformsUtils.merge([THREE.UniformsLib.fog, {
+      uTime: { value: 0 }, uLight: { value: 1 }, uIsle: { value: ISLAND_R },
+      uLobes: { value: LOBES.concat(Array(9).fill([0, 0, 1])).slice(0, 9).map(([d, h, w]) => new THREE.Vector3(d * D2R, h, w * D2R)) },
+      uSky: { value: new THREE.Color(0xbfe0ff) }, uSunDir: { value: new THREE.Vector3(0, 1, 0) }, uIce: { value: 0 },
+    }]),
+    vertexShader: `varying vec2 vXZ;
+      #include <fog_pars_vertex>
+      void main(){ vec4 wp = modelMatrix * vec4(position, 1.0); vXZ = wp.xz; vec4 mvPosition = viewMatrix * wp; gl_Position = projectionMatrix * mvPosition;
+      #include <fog_vertex>
+      }`,
+    fragmentShader: `uniform float uTime, uLight, uIsle; uniform vec3 uLobes[9];
+      varying vec2 vXZ;
+      #include <fog_pars_fragment>
+      float shoreR(float a) { float r = uIsle + 1.5 + 1.5 * sin(a * 7.0 + 1.0); for (int i = 0; i < 9; i++) { float da = atan(sin(a - uLobes[i].x), cos(a - uLobes[i].x)) / uLobes[i].z; r += uLobes[i].y * exp(-da * da); } return r; }
+      void main(){
+        float ang = atan(vXZ.y, vXZ.x), sd = length(vXZ) - shoreR(ang);      // <0 on the sand, >0 towards the sea
+        float cyc = uTime / ${WAVE_T.toFixed(1)} + 0.12 * sin(ang * 5.0) + 5.0 / 18.0 - 0.07;
+        float p = fract(cyc), k = floor(cyc);
+        float reach = -4.5 - 3.5 * (0.5 + 0.5 * sin(ang * 23.0 + k * 1.7));      // how far up the sand this wave gets
+        float front = p < 0.32 ? mix(5.0, reach, 1.0 - pow(1.0 - p / 0.32, 2.0)) : mix(reach, 5.0, pow((p - 0.32) / 0.68, 1.5));
+        float wobble = 0.35 * sin(ang * 140.0 + uTime * 1.3) + 0.25 * sin(ang * 61.0 - uTime * 0.9);
+        float f = front + wobble;
+        float sheet = smoothstep(f - 0.1, f + 0.5, sd) * smoothstep(5.5, 3.5, sd);          // thin water over the sand
+        float line = exp(-pow((sd - f) / 0.45, 2.0)) * (p < 0.32 ? 1.0 : 0.55);         // the foamy leading edge
+        float wet = step(reach, sd) * step(sd, f) * (1.0 - p) * 0.8;                    // darker wet sand left behind
+        vec3 lit = vec3(mix(0.3, 1.0, uLight));
+        vec3 col = mix(vec3(0.42, 0.36, 0.25), vec3(0.62, 0.86, 0.9), sheet) ;
+        float a = max(wet * 0.35, sheet * 0.45);
+        col = mix(col, vec3(0.97, 0.99, 1.0), line); a = max(a, line * 0.9);
+        gl_FragColor = vec4(col * lit, a);
+        #include <fog_fragment>
+      }`,
+  });
+  swashMat.userData.noIce = true; waterMats.push(swashMat);
+  add(ringShape(shorePts(8), shorePts(-10)), swashMat, 0, 0.03, 0, scene, false).rotation.x = -Math.PI / 2;
   for (const side of [-1, 1]) {
     const bank = add(new THREE.PlaneGeometry(RIVER.x1 - RIVER.x0, 2.6), mat(0xe6d3a3), (RIVER.x0 + RIVER.x1) / 2, 0.05, side * (RIVER.w / 2 + 1.3), scene, false);
     bank.rotation.x = -Math.PI / 2;
@@ -2355,6 +2403,19 @@ setTimeout(() => { // a beat later, so the loader can paint before the world is 
       if (q.t > 10) { scene.remove(q.g); tops.splice(i, 1); }
     }
   }
+  // ---------- beach ambience: waves get louder as you near the shore, and 25% louder at night ----------
+  const BEACH = { el: null, vol: 0 };
+  function updateBeach(dt) {
+    const inland = shoreAt(S.x, S.z) - Math.hypot(S.x, S.z);                 // metres from the waterline (negative = in the water)
+    const near = Math.pow(clamp(1 - (inland - 6) / 75, 0, 1), 1.6);           // full on the sand, fading out ~80 m inland
+    const want = !started || muted || underground ? 0 : near * 0.6 * (1 + 0.25 * DN.night);
+    BEACH.vol += (want - BEACH.vol) * Math.min(1, dt * 2.5);
+    if (BEACH.vol > 0.005) {
+      if (!BEACH.el) { BEACH.el = new Audio('audio/sfx/beach-waves.mp3'); BEACH.el.loop = true; }
+      BEACH.el.volume = clamp(BEACH.vol, 0, 1);
+      if (BEACH.el.paused) BEACH.el.play().catch(() => {});                    // retried until the browser allows sound
+    } else if (BEACH.el && !BEACH.el.paused) BEACH.el.pause();
+  }
   function updateToys(dt) { updateKite(dt); updateTops(dt); updatePurr(); }
 
   // ---------- Foot race: line up at START, race 4 runners ----------
@@ -4214,7 +4275,7 @@ setTimeout(() => { // a beat later, so the loader can paint before the world is 
     if (Q.level === 1) { renderer.setPixelRatio(Math.min(1, window.devicePixelRatio)); resize(); }
     else { renderer.shadowMap.enabled = false; scene.traverse((o) => { if (o.material) [].concat(o.material).forEach((m) => { m.needsUpdate = true; }); }); }
   }
-  const SYSTEMS = [step, updateRescue, updateIsland, updateLife, updatePets, updateToys, updateRace, updateFun, updateSeasons, updateDayNight, updateCamera, drawMinimap];
+  const SYSTEMS = [step, updateRescue, updateIsland, updateLife, updatePets, updateToys, updateBeach, updateRace, updateFun, updateSeasons, updateDayNight, updateCamera, drawMinimap];
   function frame(now) {
     requestAnimationFrame(frame);                    // schedule first, so nothing below can stop the loop
     const raw = (now - last) / 1000;
@@ -4248,5 +4309,5 @@ setTimeout(() => { // a beat later, so the loader can paint before the world is 
     (window.siteReady || Promise.resolve()).then(() => $('#btn-start').click());
   }
   try { buildPet(petKind); } catch { petKind = 'none'; } // the saved pet joins once the player exists
-  window.__game = { toggleUmbrella, get umbrellaOn() { return umbrellaOn; }, get thrown() { return thrown; },  SPORT, get ACT() { return ACT; }, get JOB() { return JOB; }, startJob, fb, bb, get nearAct() { return nearAct; }, toggleKite, spinTop, get kite() { return kite; }, setPet, startRace, cycleLights, get race() { return race; }, get pet() { return pet; }, runners, get lightMode() { return lightMode; }, get voices() { return voicePool.map(v => v.name + ' ' + v.lang); }, bots, benches, LIFE, hurt, openBag, openNearShop, setPose, get nearShop() { return nearShop; }, S, keys, zones, exhibits, setSeason, cycleWeather, W, get season() { return SEASONS[seasonIdx].key; }, start: () => $('#btn-start').click(), enterCave, leaveCave, skipTime, setCar, CAVE, DN, get underground() { return underground; } }; // handy for debugging
+  window.__game = { get beach() { return { vol: BEACH.vol, playing: !!(BEACH.el && !BEACH.el.paused) }; },  toggleUmbrella, get umbrellaOn() { return umbrellaOn; }, get thrown() { return thrown; },  SPORT, get ACT() { return ACT; }, get JOB() { return JOB; }, startJob, fb, bb, get nearAct() { return nearAct; }, toggleKite, spinTop, get kite() { return kite; }, setPet, startRace, cycleLights, get race() { return race; }, get pet() { return pet; }, runners, get lightMode() { return lightMode; }, get voices() { return voicePool.map(v => v.name + ' ' + v.lang); }, bots, benches, LIFE, hurt, openBag, openNearShop, setPose, get nearShop() { return nearShop; }, S, keys, zones, exhibits, setSeason, cycleWeather, W, get season() { return SEASONS[seasonIdx].key; }, start: () => $('#btn-start').click(), enterCave, leaveCave, skipTime, setCar, CAVE, DN, get underground() { return underground; } }; // handy for debugging
 }, 30);

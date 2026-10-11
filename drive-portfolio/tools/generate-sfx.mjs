@@ -26,6 +26,7 @@ const SFX = [
   ['ball-bounce', 'A rubber dog ball bouncing twice on grass, close up, clean, no background noise', 0.8],
   ['frisbee-throw', 'A plastic frisbee being thrown, a quick whoosh as it flies past, clean, no background noise', 1.0],
   ['coin-register', 'A cash register ching with coins, a successful sale, short and bright, clean', 1.0],
+  ['beach-waves', 'Gentle ocean waves rolling onto a sandy beach and washing back, steady calm surf, natural, seamless loop, no music, no voices, no birds', 20],
   ['top-spin', 'A wooden spinning top whirring and humming as it spins on a stone floor, steady, clean', 3.0],
 ];
 for (const [name, text, dur] of SFX) {

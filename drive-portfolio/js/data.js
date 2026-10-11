@@ -98,6 +98,7 @@ window.PORTFOLIO = {
       title: "Recognition",
       color: "#9333ea",
       body: `
+        <div class="card"><h4>🌟 Innovation of the Quarter — Aquera Stars</h4><p>Awarded by Aquera for outstanding contribution to the organisation, with a certificate and a cash award.</p></div>
         <div class="card"><h4>🏆 National-level recognition</h4><p>1st Prize — Smart India Hackathon</p></div>
         <div class="card"><h4>⚙️ Engineering beyond software</h4><p>AI, computer vision, robotics and hardware–software integration</p></div>
         <div class="card"><h4>🤝 Customer impact</h4><p>70+ customers served · 4.6/5 rating</p></div>
@@ -115,7 +116,7 @@ window.PORTFOLIO = {
           <li><a href="https://www.linkedin.com/in/sachayanthan-v-jain-040838150/" target="_blank" rel="noopener">LinkedIn</a></li>
           <li><a href="https://github.com/Sachayanthan-V" target="_blank" rel="noopener">GitHub</a></li>
           <li><a href="https://www.instagram.com/sachin_1999_20_01/" target="_blank" rel="noopener">Instagram</a></li>
-          <li><a href="../Portfolio/assets/Sachayanthan_V_Resume.pdf" download>Download résumé</a></li>
+          <li><a href="../Portfolio/assets/Sachayanthan_V_Resume.pdf?v=20261012b" download>Download résumé</a></li>
         </ul>`
     }
   ]
