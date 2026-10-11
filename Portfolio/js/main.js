@@ -41,6 +41,16 @@
   const splitImgs = gsap.utils.toArray('.split-img');
   const skipBtn = document.getElementById('skipIntro');
   const isPhone = () => window.innerWidth <= 860;
+  // phones: shrink the collage just enough to sit in the space under the pillars (screen heights vary a lot)
+  const PHONE_GAP = 14;
+  function phoneCollageScale() {
+    const pillars = document.querySelector('.landing-pillars');
+    if (!pillars) return 0.76;
+    // the collage scales from its bottom edge, so that edge never moves: fit the rest above it
+    const free = imagesWrap.getBoundingClientRect().bottom - pillars.getBoundingClientRect().bottom - PHONE_GAP;
+    return Math.max(0.42, Math.min(0.76, free / imagesWrap.offsetHeight));
+  }
+
 
   // initial states: questions, collage and landing hidden until the timeline brings them in
   gsap.set([images, deco, splitImgs], { autoAlpha: 0 });
@@ -102,7 +112,7 @@
         { rotationY: () => (isPhone() ? 0 : -9), rotationX: () => (isPhone() ? 0 : 3), transformPerspective: 1800, duration: 1.1 }, m)
       // phones: the collage shrinks into the space left under the pillars instead of covering them
       .to(imagesWrap, {
-        scale: () => (isPhone() ? 0.76 : 1),
+        scale: () => (isPhone() ? phoneCollageScale() : 1),
         transformOrigin: () => (isPhone() ? '50% 100%' : '50% 50%'),
         duration: 0.8,
       }, m)
@@ -112,6 +122,13 @@
       .to(nav, { opacity: 1, y: 0, duration: 0.6 }, m + 0.3)
       .set(nav, { pointerEvents: 'auto' }, m + 0.3);
     if (instant) tl.progress(1); // jump straight to the finished landing
+    // keep the fit right if the phone rotates or the browser bar shows/hides
+    let fitQueued = false;
+    addEventListener('resize', () => {
+      if (fitQueued || !isPhone() || tl.progress() < 1) return;
+      fitQueued = true;
+      requestAnimationFrame(() => { fitQueued = false; gsap.set(imagesWrap, { scale: phoneCollageScale(), transformOrigin: '50% 100%' }); });
+    });
   }
 
   // Reload behaviour: the intro only plays when the page is at the top. If this tab was reloaded
