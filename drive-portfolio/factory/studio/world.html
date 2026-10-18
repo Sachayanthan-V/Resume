@@ -1,0 +1,507 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Walk the World</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root { --ink: #1f1a33; --p: #7c3aed; --pl: #ede9fe; --panel: rgba(255, 255, 255, 0.93); --muted: #6b6480; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #cfe8ff; font-family: Fredoka, system-ui, sans-serif; color: var(--ink); }
+  #c { position: fixed; inset: 0; display: block; }
+  .hud { position: fixed; pointer-events: none; }
+  #where { top: 14px; left: 14px; background: var(--panel); border-radius: 14px; padding: 10px 14px; box-shadow: 0 6px 20px rgba(30, 20, 60, 0.15); min-width: 220px; }
+  #where b { display: block; font-size: 20px; } #where small { color: var(--muted); font-size: 13px; }
+  #toast { top: 18%; left: 50%; transform: translateX(-50%); background: rgba(59, 7, 100, 0.85); color: #ffd84a; font-size: 30px; font-weight: 700; padding: 10px 26px; border-radius: 18px; opacity: 0; transition: opacity 0.4s; white-space: nowrap; }
+  #prompt { bottom: 70px; left: 50%; transform: translateX(-50%); background: var(--panel); padding: 9px 16px; border-radius: 12px; font-size: 17px; display: none; box-shadow: 0 6px 20px rgba(30, 20, 60, 0.2); }
+  #prompt kbd, .keys kbd { background: var(--p); color: #fff; border-radius: 6px; padding: 1px 8px; font-family: inherit; font-weight: 600; }
+  #map { top: 14px; right: 14px; background: var(--panel); border-radius: 14px; padding: 8px; box-shadow: 0 6px 20px rgba(30, 20, 60, 0.15); pointer-events: auto; }
+  #map canvas { display: block; border-radius: 8px; } #map .row { display: flex; gap: 4px; margin-top: 6px; }
+  #map button { flex: 1; border: 0; border-radius: 8px; padding: 4px 0; font: 600 12px Fredoka, system-ui; background: var(--pl); color: var(--p); cursor: pointer; } #map button.on { background: var(--p); color: #fff; }
+  #keys { bottom: 14px; left: 14px; font-size: 13px; color: #fff; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6); }
+  #panel { position: fixed; top: 0; left: 0; bottom: 0; width: 320px; background: var(--panel); box-shadow: 4px 0 24px rgba(30, 20, 60, 0.2); transform: translateX(-100%); transition: transform 0.25s; overflow: auto; padding: 14px 14px 30px; box-sizing: border-box; z-index: 5; }
+  #panel.open { transform: none; } #panel h2 { margin: 0 0 4px; font-size: 20px; } #panel h3 { margin: 16px 0 6px; font-size: 14px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+  #panel .it { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 9px; cursor: pointer; font-size: 14px; } #panel .it:hover { background: var(--pl); }
+  #panel .n { width: 22px; height: 22px; border-radius: 50%; background: var(--p); color: #fff; font-size: 12px; display: grid; place-items: center; flex: none; }
+  #panel .ok { margin-left: auto; color: #16a34a; font-weight: 700; } #panel .prog { font-size: 13px; color: var(--muted); }
+  #panel textarea { width: 100%; box-sizing: border-box; border: 1px solid #ddd; border-radius: 8px; font: 14px Fredoka, system-ui; padding: 6px; }
+  .btns { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; } .btns button { border: 0; border-radius: 9px; padding: 7px 10px; background: var(--p); color: #fff; font: 600 13px Fredoka, system-ui; cursor: pointer; } .btns button.ghost { background: var(--pl); color: var(--p); }
+  #menuBtn { position: fixed; bottom: 14px; right: 14px; z-index: 6; border: 0; border-radius: 12px; padding: 9px 14px; background: var(--p); color: #fff; font: 600 14px Fredoka, system-ui; cursor: pointer; box-shadow: 0 6px 20px rgba(30, 20, 60, 0.25); }
+  #loading { position: fixed; inset: 0; display: grid; place-items: center; background: #f4f0ff; z-index: 9; font-size: 22px; color: var(--p); }
+  #noteBox { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); background: #fff; border-radius: 16px; padding: 16px; width: 360px; box-shadow: 0 20px 60px rgba(30, 20, 60, 0.35); z-index: 8; display: none; }
+  #noteBox textarea { width: 100%; height: 90px; box-sizing: border-box; border-radius: 10px; border: 1px solid #ddd; font: 15px Fredoka, system-ui; padding: 8px; }
+  #mixBtn { position: fixed; bottom: 14px; right: 230px; z-index: 6; border: 0; border-radius: 12px; padding: 9px 14px; background: #fff; color: var(--p); font: 600 14px Fredoka, system-ui; cursor: pointer; box-shadow: 0 6px 20px rgba(30, 20, 60, 0.25); }
+  #mixer { position: fixed; right: 14px; top: 312px; bottom: 64px; width: 340px; overflow: auto; background: var(--panel); border-radius: 16px; box-shadow: 0 12px 40px rgba(30, 20, 60, 0.3); padding: 12px 14px; z-index: 7; display: none; }
+  #mixer h3 { margin: 10px 0 4px; font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; } #mixer .r { display: grid; grid-template-columns: 1fr 130px 40px; align-items: center; gap: 6px; font-size: 13px; padding: 2px 0; }
+  #mixer input[type=range] { width: 100%; accent-color: #7c3aed; } #mixer .v { text-align: right; color: var(--muted); font-size: 12px; } #mixer .r.live b { color: #16a34a; }
+  #camBtn { position: fixed; bottom: 14px; right: 340px; z-index: 6; border: 0; border-radius: 12px; padding: 9px 14px; background: #fff; color: var(--p); font: 600 14px Fredoka, system-ui; cursor: pointer; box-shadow: 0 6px 20px rgba(30, 20, 60, 0.25); }
+  #camPanel { position: fixed; right: 14px; top: 312px; width: 340px; background: var(--panel); border-radius: 16px; box-shadow: 0 12px 40px rgba(30, 20, 60, 0.3); padding: 12px 14px; z-index: 7; display: none; }
+  #camPanel .r { display: grid; grid-template-columns: 1fr 130px 46px; align-items: center; gap: 6px; font-size: 13px; padding: 2px 0; } #camPanel input[type=range] { width: 100%; accent-color: #7c3aed; } #camPanel .v { text-align: right; color: var(--muted); font-size: 12px; }
+  body.cine .hud, body.cine button, body.cine #fps { display: none !important; }
+  #skip { position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%); z-index: 9; display: none; padding: 8px 16px; border-radius: 999px; background: rgba(20, 12, 40, 0.55); color: #fde68a; font: 600 14px Fredoka, system-ui; letter-spacing: 0.3px; }
+  body.cine #skip { display: block; }
+  #fade { position: fixed; inset: 0; background: #fff; opacity: 0; pointer-events: none; z-index: 10; transition: opacity 1.2s; }
+  #nightBtn { position: fixed; top: 84px; left: 14px; z-index: 6; border: 0; border-radius: 12px; padding: 9px 14px; background: #1e1b4b; color: #fde68a; font: 600 14px Fredoka, system-ui; cursor: pointer; box-shadow: 0 6px 20px rgba(30, 20, 60, 0.25); }
+  #fps { position: fixed; top: 8px; left: 50%; transform: translateX(-50%); font-size: 12px; color: #fff; text-shadow: 0 1px 2px #000; pointer-events: none; }
+</style></head>
+<body>
+<canvas id="c"></canvas>
+<div id="loading">Building the Zungga Chocolate Factory…</div>
+<div id="where" class="hud"><b id="areaName">—</b><small id="floorName">Ground floor</small></div>
+<div id="toast" class="hud"></div>
+<div id="prompt" class="hud"></div>
+<div id="map" class="hud"><canvas id="mm" width="240" height="240"></canvas><div class="row"><button data-f="first">1st</button><button data-f="ground">Ground</button><button data-f="under">Under</button></div></div>
+<div id="keys" class="hud keys"><kbd>W</kbd><kbd>S</kbd> walk · <kbd>A</kbd><kbd>D</kbd> turn · <kbd>Shift</kbd> run · <kbd>Space</kbd> jump/swim up · <kbd>E</kbd> use · drag = look · <kbd>F</kbd> free cam · <kbd>M</kbd> menu · <kbd>N</kbd> note · <kbd>P</kbd> photo · <kbd>K</kbd> sound · <kbd>L</kbd> night</div>
+<div id="fps"></div>
+<button id="menuBtn">☰ Places &amp; checklist</button>
+<button id="mixBtn">🔊 Mixer</button>
+<button id="camBtn">🎥 Camera</button>
+<button id="nightBtn">🌙 Night</button>
+<div id="skip">Press Space to skip ⏭</div>
+<div id="fade"></div>
+<div id="camPanel"></div>
+<div id="mixer"></div>
+<div id="panel"></div>
+<div id="noteBox"><b>Note at this spot</b><p style="margin:4px 0 8px;color:#6b6480;font-size:13px" id="noteWhere"></p><textarea id="noteText" placeholder="e.g. this wall is missing, make the vat bigger…"></textarea><div class="btns"><button id="noteSave">Save note</button><button class="ghost" id="noteCancel">Cancel</button></div></div>
+
+<script src="../vendor/three.min.js?v=mve67f4h"></script>
+<script src="assets/core.js?v=mve67f4h"></script>
+<script src="assets/money.js?v=mve67f4h"></script><script src="assets/food.js?v=mve67f4h"></script><script src="assets/toys.js?v=mve67f4h"></script><script src="assets/school.js?v=mve67f4h"></script>
+<script src="assets/furniture.js?v=mve67f4h"></script><script src="assets/shop.js?v=mve67f4h"></script><script src="assets/brand.js?v=mve67f4h"></script><script src="assets/nature.js?v=mve67f4h"></script>
+<script src="assets/sets.js?v=mve67f4h"></script><script src="assets/bank.js?v=mve67f4h"></script><script src="assets/home.js?v=mve67f4h"></script><script src="assets/transport.js?v=mve67f4h"></script>
+<script src="assets/tech.js?v=mve67f4h"></script><script src="assets/street.js?v=mve67f4h"></script><script src="assets/village.js?v=mve67f4h"></script><script src="assets/outdoors.js?v=mve67f4h"></script>
+<script src="assets/islanders.js?v=mve67f4h"></script>
+<script src="assets/animals.js?v=mve67f4h"></script><script src="assets/garage.js?v=mve67f4h"></script><script src="assets/sports.js?v=mve67f4h"></script><script src="assets/sky.js?v=mve67f4h"></script>
+<script src="assets/seasons.js?v=mve67f4h"></script><script src="assets/cave.js?v=mve67f4h"></script>
+<script src="characters/toons.js?v=mve67f4h"></script>
+<script src="characters/explorers.js?v=mve67f4h"></script>
+<script src="characters/creatures.js?v=mve67f4h"></script>
+<script src="js/world-kit.js?v=mve67f4h"></script>
+<script src="js/walker.js?v=mve67f4h"></script>
+<script src="js/world-audio.js?v=mve67f4h"></script>
+<script src="worlds/chocolate-factory/layout.js?v=mve67f4h"></script>
+<script src="worlds/chocolate-factory/living.js?v=mve67f4h"></script>
+<script src="worlds/chocolate-factory/dress-ground.js?v=mve67f4h"></script>
+<script src="worlds/chocolate-factory/dress-first.js?v=mve67f4h"></script>
+<script src="worlds/chocolate-factory/dress-under.js?v=mve67f4h"></script>
+<script src="worlds/chocolate-factory/people.js?v=mve67f4h"></script>
+<script src="worlds/chocolate-factory/ground.js?v=mve67f4h"></script>
+<script src="worlds/chocolate-factory/first.js?v=mve67f4h"></script>
+<script src="worlds/chocolate-factory/under.js?v=mve67f4h"></script>
+<script src="worlds/chocolate-factory/fill.js?v=mve67f4h"></script>
+<script>
+(async () => {
+  'use strict';
+  const T = THREE, $ = (s) => document.querySelector(s), q = new URLSearchParams(location.search), L = ZFactory.layout;
+  await new Promise((r) => setTimeout(r, 30));
+  // ---------- renderer / scene ----------
+  const canvas = $('#c'), renderer = new T.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: true, powerPreference: 'high-performance' });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, +(q.get('pr') || 1.5))); renderer.shadowMap.enabled = true; renderer.shadowMap.type = T.PCFSoftShadowMap;
+  renderer.toneMapping = T.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05; renderer.outputColorSpace = T.SRGBColorSpace;
+  const scene = new T.Scene(), camera = new T.PerspectiveCamera(55, 1, 0.1, 1200);
+  const skyTex = ZA.tex((c, w, h) => { const g = c.createLinearGradient(0, 0, 0, h); g.addColorStop(0, '#6fb5ff'); g.addColorStop(0.55, '#bfe0ff'); g.addColorStop(1, '#fde7c8'); c.fillStyle = g; c.fillRect(0, 0, w, h); }, 16, 256);
+  const sky = new T.Mesh(new T.SphereGeometry(850, 32, 16), new T.MeshBasicMaterial({ map: skyTex, side: T.BackSide, fog: false })); scene.add(sky);
+  const hemi = new T.HemisphereLight(0xeaf4ff, 0xb08a62, 1.15); scene.add(hemi);
+  const sun = new T.DirectionalLight(0xfff0d8, 2.4); sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); const sc = sun.shadow.camera; sc.left = -32; sc.right = 32; sc.top = 32; sc.bottom = -32; sc.near = 1; sc.far = 220; sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.03; scene.add(sun, sun.target);
+  const lantern = new T.PointLight(0xffd6a0, 0, 12, 1.4); scene.add(lantern);
+  // ---------- sky life: drifting clouds, and for the night a dark sky, stars and a moon ----------
+  const nightTex = ZA.tex((c, w, h) => { const g = c.createLinearGradient(0, 0, 0, h); g.addColorStop(0, '#060a1f'); g.addColorStop(0.55, '#16204a'); g.addColorStop(1, '#3a2f5c'); c.fillStyle = g; c.fillRect(0, 0, w, h); }, 16, 256);
+  const skyNight = new T.Mesh(new T.SphereGeometry(840, 32, 16), new T.MeshBasicMaterial({ map: nightTex, side: T.BackSide, fog: false, transparent: true, opacity: 0, depthWrite: false })); scene.add(skyNight);
+  const stars = (() => { const n = 1800, pos = new Float32Array(n * 3); for (let i = 0; i < n; i++) { const th = Math.random() * Math.PI * 2, ph = Math.random() * Math.PI * 0.45; pos.set([Math.cos(th) * Math.sin(ph) * 800, Math.cos(ph) * 800 + 20, Math.sin(th) * Math.sin(ph) * 800], i * 3); } const g = new T.BufferGeometry(); g.setAttribute('position', new T.BufferAttribute(pos, 3)); return new T.Points(g, new T.PointsMaterial({ color: 0xffffff, size: 2.2, sizeAttenuation: false, fog: false, transparent: true, opacity: 0, depthWrite: false })); })(); scene.add(stars);
+  const moon = new T.Mesh(new T.SphereGeometry(18, 24, 16), new T.MeshBasicMaterial({ color: 0xfff6d8, fog: false, transparent: true, opacity: 0 })); moon.position.set(-300, 420, -500); scene.add(moon);
+  const cloudM = new T.MeshStandardMaterial({ color: 0xffffff, roughness: 1, fog: false, transparent: true, opacity: 0.95 }), clouds = [];
+  for (let i = 0; i < 26; i++) { const g = new T.Group(), n = 4 + (i % 4); for (let k = 0; k < n; k++) { const m = new T.Mesh(new T.SphereGeometry(10 + Math.random() * 9, 14, 10), cloudM); m.position.set((k - n / 2) * 11 + Math.random() * 6, Math.random() * 6, Math.random() * 10); m.scale.y = 0.55; g.add(m); } const a = Math.random() * Math.PI * 2, r = 260 + Math.random() * 380; g.position.set(Math.cos(a) * r, 90 + Math.random() * 60, Math.sin(a) * r); g.userData.v = 2 + Math.random() * 4; scene.add(g); clouds.push(g); }
+  // ---------- day / night ----------
+  let DN = 0, DNt = 0, DNrate = 0.9, isUG = false; const C_ = (h) => new T.Color(h);
+  const DAYN = { hemi: C_(0xeaf4ff), hemiG: C_(0xb08a62), sun: C_(0xfff0d8), fog: C_(0xcfe8ff) }, NIGHT = { hemi: C_(0x6b7bb8), hemiG: C_(0x23283d), sun: C_(0xa8bcff), fog: C_(0x121a33) };
+  const lampLights = Array.from({ length: 12 }, () => { const l = new T.PointLight(0xffc070, 0, 18, 1.5); scene.add(l); return l; });
+  let lampT = 0;
+  function applyLight(dt) {
+    DN += (DNt - DN) * Math.min(1, dt * DNrate);
+    for (const cl of clouds) { cl.position.x += cl.userData.v * dt; if (cl.position.x > 700) cl.position.x = -700; }
+    cloudM.color.setRGB(1 - DN * 0.72, 1 - DN * 0.7, 1 - DN * 0.55);
+    if (isUG) return;
+    hemi.intensity = 1.15 + (0.32 - 1.15) * DN; hemi.color.lerpColors(DAYN.hemi, NIGHT.hemi, DN); hemi.groundColor.lerpColors(DAYN.hemiG, NIGHT.hemiG, DN);
+    sun.intensity = 2.4 + (0.5 - 2.4) * DN; sun.color.lerpColors(DAYN.sun, NIGHT.sun, DN); scene.fog.color.lerpColors(DAYN.fog, NIGHT.fog, DN);
+    skyNight.material.opacity = DN; stars.material.opacity = DN; moon.material.opacity = DN; renderer.toneMappingExposure = 1.05 - DN * 0.1;
+    for (const m of windowMats) m.emissiveIntensity = 0.6 + DN * 1.4;
+    if ((lampT -= dt) <= 0) { lampT = 0.4; const p = walker.mode === 'free' ? camera.position : walker.pos, near = (W.lamps || []).map((l) => [l, (l[0] - p.x) ** 2 + (l[2] - p.z) ** 2]).sort((a2, b2) => a2[1] - b2[1]).slice(0, lampLights.length); lampLights.forEach((l, i) => { const q = near[i]; if (q) l.position.set(q[0][0], q[0][1], q[0][2]); l.userData.on = !!q; }); }
+    for (const l of lampLights) l.intensity = l.userData.on ? DN * 26 : 0;
+  }
+  const windowMats = [];   // the glowing window panes (brighter at night)
+  scene.fog = new T.Fog(0xcfe8ff, 220, 800);
+  // distant hills
+  for (let i = 0; i < 18; i++) { const a = i / 18 * Math.PI * 2, r = 330 + (i % 3) * 45, hill = new T.Mesh(new T.SphereGeometry(55 + (i % 4) * 16, 18, 10, 0, Math.PI * 2, 0, Math.PI / 2), new T.MeshStandardMaterial({ color: [0x7fb85a, 0x6aa84f, 0x8cc063][i % 3], roughness: 1 })); hill.position.set(Math.sin(a) * r, -2, Math.cos(a) * r); hill.scale.y = 0.55; scene.add(hill); }
+
+  // ---------- the world ----------
+  const t0 = performance.now();
+  const W = ZWorld.create(scene);
+  ZFactory.buildGround(W); ZFactory.buildFirst(W); ZFactory.buildUnder(W); const cleared = ZFactory.finish(W);
+  const built = performance.now();
+  const stats = {}; for (const k of Object.keys(W.floors)) stats[k] = W.bake(W.floors[k]);
+  const baked = performance.now();
+  { const seen = new Set(); scene.traverse((o) => { if (o.isMesh && o.material && o.material.emissive && !seen.has(o.material)) { const e = o.material.emissive.getHex(); if ((e === 0xffd890 || e === 0xdff3ff || e === 0xffe2a8) && o.material.emissiveIntensity <= 0.7) { seen.add(o.material); windowMats.push(o.material); } } }); }
+  const crowd = ZFactory.people ? ZFactory.people(W) : null;
+  // ---------- the box kid ----------
+  const kid = ZCharacters.toon({ ...ZCharacters.TOON_PRESETS.hero }); kid.group.traverse((o) => { if (o.isMesh) { o.castShadow = true; } }); scene.add(kid.group);
+  const startArea = q.get('at');
+  const walker = ZWalker.create({ world: W, camera, dom: canvas, char: kid, start: { x: L.ground.entrance.outer.x + 4, y: 0.05, z: L.ground.entrance.outer.z + 9, yaw: Math.PI },
+    onArea: (a) => onArea(a), onPrompt: (p) => { const el = $('#prompt'); el.style.display = p ? 'block' : 'none'; if (p) el.innerHTML = `<kbd>E</kbd> ${p}`; }, onMode: (m) => { if (m === 'swim') { toast('Swimming!'); audio.play('splash', 0.9); } } });
+
+  // ---------- sounds of every place (made live; start on the first click / key) ----------
+  const audio = ZWorldAudio.create();
+  const startAudio = () => audio.start(); addEventListener('pointerdown', startAudio); addEventListener('keydown', startAudio);
+  addEventListener('zworld-door', (e) => { const d = e.detail, p = walker.pos, dist = Math.hypot(d.x - p.x, d.z - p.z) + Math.abs(d.y - p.y) * 2; if (dist < 18) audio.play(d.open ? 'door' : 'doorClose', 1 - dist / 18); });
+  // ---------- the mixer: a level for every sound; Save writes studio/assets/mix.json (the defaults for everyone + the videos) ----------
+  const MIX_LABEL = { master: 'Master volume', water: 'Chocolate river', fountain: 'Plaza fountain', waterfall: 'Waterfalls', birds: 'Birds (open land)', vats: 'Chocolate vats (kitchen)', machines: 'Machines (workshop, machinery hall)', beeps: 'Console beeps (control rooms)', bakery: 'Ovens (bakery)', cafe: 'Chatter (café, meeting, training)', lab: 'Bubbles (labs)', puff: 'Puffs (marshmallow)', warehouse: 'Crates (warehouse)', cave: 'Underground wind + drips', magic: 'Magic shimmer (vault, chamber)', train: 'Train', door: 'Doors', splash: 'Splash', whistle: 'Train whistle' };
+  const VID_LABEL = { voice: 'Voice', music: 'Background music', ambience: 'Ambience (rain, waves…)', sfx: 'Sound effects (coins, thunder…)' };
+  let MIX = { world: {}, video: { voice: 1, music: 1, ambience: 1, sfx: 1 } };
+  const STUDIO = await fetch('/api/mix', { cache: 'no-store' }).then((r) => r.ok && (r.headers.get('content-type') || '').includes('json')).catch(() => false);   // false on the public site (no studio server): no notes, no Save
+  try { const r = await fetch('/api/mix'); if (r.ok) MIX = { ...MIX, ...(await r.json()) }; else { const r2 = await fetch('assets/mix.json', { cache: 'no-store' }); if (r2.ok) MIX = { ...MIX, ...(await r2.json()) }; } } catch { /* defaults */ }
+  audio.mix = MIX.world;
+  function renderMixer() {
+    const row = (grp, k, label) => { const v = MIX[grp][k] ?? (k === 'master' ? 0.8 : 1), live = grp === 'world' && audio._lv && audio._lv[k] > 0.01; return `<div class="r${live ? ' live' : ''}"><span>${live ? '<b>●</b> ' : ''}${label}</span><input type="range" min="0" max="${k === 'master' ? 1.5 : 2}" step="0.05" value="${v}" data-g="${grp}" data-k="${k}"><span class="v">${Math.round(v * 100)}%</span></div>`; };
+    $('#mixer').innerHTML = `<b style="font-size:16px">Sound mixer</b><div class="prog" style="font-size:12px;color:#6b6480">Move a slider and listen. ● = playing here now. Save makes these the defaults (for everyone, and for videos).</div>
+      <h3>Factory world</h3>${Object.keys(MIX_LABEL).map((k) => row('world', k, MIX_LABEL[k])).join('')}
+      <h3>Story videos (defaults)</h3>${Object.keys(VID_LABEL).map((k) => row('video', k, VID_LABEL[k])).join('')}
+      <div class="btns"><button id="mixSave">Save as default</button><button class="ghost" id="mixReset">Reset to 100%</button><button class="ghost" id="mixClose">Close</button></div><div id="mixMsg" style="font-size:12px;color:#6b6480;margin-top:6px">${MIX.saved ? 'Last saved ' + new Date(MIX.saved).toLocaleString() : ''}</div>`;
+    $('#mixer').querySelectorAll('input[type=range]').forEach((el) => el.oninput = () => { MIX[el.dataset.g][el.dataset.k] = +el.value; el.nextElementSibling.textContent = Math.round(el.value * 100) + '%'; audio.mix = MIX.world; if (el.dataset.g === 'world' && ['door', 'splash', 'whistle'].includes(el.dataset.k)) audio.play(el.dataset.k === 'door' ? 'door' : el.dataset.k, 1); });
+    if (!STUDIO) { $('#mixSave').style.display = 'none'; $('#mixMsg').textContent = 'Volume changes last for this visit.'; }
+    $('#mixSave').onclick = async () => { try { const r = await fetch('/api/mix', { method: 'PUT', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ world: MIX.world, video: MIX.video }) }); if (!r.ok) throw new Error(); MIX = { ...MIX, ...(await r.json()) }; $('#mixMsg').textContent = 'Saved ✓ — studio/assets/mix.json'; toast('Mixer saved'); } catch { $('#mixMsg').textContent = 'Could not save (is the studio server running?)'; } };
+    $('#mixReset').onclick = () => { for (const k of Object.keys(MIX_LABEL)) MIX.world[k] = k === 'master' ? 0.8 : 1; for (const k of Object.keys(VID_LABEL)) MIX.video[k] = 1; audio.mix = MIX.world; renderMixer(); };
+    $('#mixClose').onclick = () => { $('#mixer').style.display = 'none'; };
+  }
+  // ---------- camera: move the view in every way, save it as the default (studio/assets/mix.json → camera) ----------
+  const CAM_UI = [['back', 'Distance behind', 1.5, 14, 0.1, 'm'], ['up', 'Height', 0.3, 8, 0.05, 'm'], ['look', 'Look at height', 0.2, 3, 0.05, 'm'], ['ahead', 'Look ahead', 0, 10, 0.1, 'm'], ['side', 'Side offset (− left / + right)', -3, 3, 0.05, 'm'], ['orbit', 'Angle around the kid', -180, 180, 1, '°'], ['stiff', 'Follow speed', 1, 20, 0.5, ''], ['fov', 'Field of view', 30, 95, 1, '°']];
+  if (MIX.camera) walker.setCam(MIX.camera);
+  function renderCam() {
+    $('#camPanel').innerHTML = `<b style="font-size:16px">Camera</b><div style="font-size:12px;color:#6b6480">Move the sliders while walking. Save makes this the default view.</div>` + CAM_UI.map(([k, label, min, max, st, u]) => `<div class="r"><span>${label}</span><input type="range" min="${min}" max="${max}" step="${st}" value="${walker.cam[k]}" data-k="${k}"><span class="v">${(+walker.cam[k]).toFixed(st < 1 ? 1 : 0)}${u}</span></div>`).join('')
+      + `<div class="btns"><button id="camSave">Save as default</button><button class="ghost" id="camReset">Reset</button><button class="ghost" id="camClose">Close</button></div><div id="camMsg" style="font-size:12px;color:#6b6480;margin-top:6px"></div>`;
+    $('#camPanel').querySelectorAll('input[type=range]').forEach((el) => el.oninput = () => { walker.setCam({ [el.dataset.k]: +el.value }); const d = CAM_UI.find((c) => c[0] === el.dataset.k); el.nextElementSibling.textContent = (+el.value).toFixed(d[4] < 1 ? 1 : 0) + d[5]; });
+    if (!STUDIO) { $('#camSave').style.display = 'none'; $('#camMsg').textContent = 'Changes last for this visit.'; }
+    $('#camSave').onclick = async () => { try { const camera = {}; for (const [k] of CAM_UI) camera[k] = +walker.cam[k]; const r = await fetch('/api/mix', { method: 'PUT', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ camera }) }); if (!r.ok) throw new Error(); MIX = { ...MIX, ...(await r.json()) }; $('#camMsg').textContent = 'Saved ✓ — studio/assets/mix.json'; toast('Camera saved'); } catch { $('#camMsg').textContent = 'Could not save (is the studio server running?)'; } };
+    $('#camReset').onclick = () => { walker.setCam(walker.CAM_DEFAULTS); renderCam(); };
+    $('#camClose').onclick = () => { $('#camPanel').style.display = 'none'; };
+  }
+  const setNight = (on) => { DNt = on ? 1 : 0; $('#nightBtn').textContent = on ? '☀️ Day' : '🌙 Night'; $('#nightBtn').style.background = on ? '#fde68a' : '#1e1b4b'; $('#nightBtn').style.color = on ? '#3b0764' : '#fde68a'; };
+  $('#nightBtn').onclick = () => setNight(DNt < 0.5); if (q.get('night')) setNight(true);
+  $('#camBtn').onclick = () => { const m = $('#camPanel'); m.style.display = m.style.display === 'block' ? 'none' : 'block'; $('#mixer').style.display = 'none'; if (m.style.display === 'block') renderCam(); };
+  $('#mixBtn').onclick = () => { $('#camPanel').style.display = 'none'; const m = $('#mixer'); m.style.display = m.style.display === 'block' ? 'none' : 'block'; if (m.style.display === 'block') { audio.start(); renderMixer(); } };
+  setInterval(() => { if ($('#mixer').style.display === 'block' && !$('#mixer').matches(':hover')) renderMixer(); }, 1500);   // refresh the ● "playing here" marks
+
+  const BED_OF = { chocolate_kitchen: 'vats', machine_workshop: 'machines', control_room: 'beeps', control_room_f1: 'beeps', security_center: 'beeps', cookie_bakery: 'bakery', workers_cafe: 'cafe', candy_lab: 'lab', innovation_lab: 'lab', quality_lab: 'lab', marshmallow_workshop: 'puff', ingredient_warehouse: 'warehouse', meeting_hall: 'cafe', training_room: 'cafe', machinery_hall: 'machines', secret_chamber: 'magic', recipe_vault: 'magic' };
+  const BEDS = ['water', 'fountain', 'waterfall', 'birds', 'vats', 'machines', 'beeps', 'bakery', 'cafe', 'lab', 'puff', 'warehouse', 'cave', 'magic', 'train'];
+  const segD = (x, z, P) => { let d = 1e9; for (let i = 0; i < P.length - 1; i++) { const [ax, az] = P[i], [bx, bz] = P[i + 1], vx = bx - ax, vz = bz - az, t = Math.max(0, Math.min(1, ((x - ax) * vx + (z - az) * vz) / (vx * vx + vz * vz))); d = Math.min(d, Math.hypot(x - ax - vx * t, z - az - vz * t)); } return d; };
+  let lastEngine = null, engineSpeed = 0, wasStopped = true;
+  function updateAudio(dt) {
+    const p = walker.mode === 'free' ? camera.position : walker.pos, fl = floorOf(p.y), a = walker.area, G = L.ground, lv = {}; for (const b of BEDS) lv[b] = 0;
+    const indoor = a && (G.buildings.some((b) => b.id === a.id) || L.first.rooms.some((r) => r.id === a.id)), out = indoor ? 0.3 : 1;
+    if (fl === 'ground' || fl === 'first') {
+      const up = fl === 'first' ? 0.45 : 1;
+      lv.water = Math.max(0, 1 - segD(p.x, p.z, G.river.points) / 26) * 0.55 * out * up;
+      lv.fountain = Math.max(0, 1 - Math.hypot(p.x - G.plaza.x, p.z - G.plaza.z) / (G.plaza.r + 14)) * 0.5 * out * up;
+      lv.waterfall = Math.max(0, 1 - Math.min(Math.hypot(p.x - G.pool.x, p.z - G.pool.z), Math.hypot(p.x - G.aqueduct.x, p.z - (G.aqueduct.z0 + G.aqueduct.z1) / 2)) / 38) * 0.7 * out;
+      { let dB = 1e9; for (const b of G.buildings) dB = Math.min(dB, Math.max(Math.abs(p.x - b.x) - b.w / 2, Math.abs(p.z - b.z) - b.d / 2, 0));
+        const B2 = L.bounds, dEdge = Math.min(p.x - B2.x0, B2.x1 - p.x, p.z - B2.z0, B2.z1 - p.z), dGarden = Math.hypot(p.x - G.garden.x, p.z - G.garden.z);
+        const open = Math.max(0, Math.min(1, (dB - 8) / 18)), edge = Math.max(Math.max(0, Math.min(1, 1 - (dEdge - 6) / 40)), Math.max(0, Math.min(1, 1 - (dGarden - 10) / 25)));
+        lv.birds = indoor || fl !== 'ground' ? 0 : open * edge * 0.4; }
+      if (W.train) { const e = W.train.cars[0].position, d = Math.hypot(e.x - p.x, e.z - p.z); lv.train = Math.max(0, 1 - d / 55) * 0.65 * out;
+        if (lastEngine) { const sp = Math.hypot(e.x - lastEngine.x, e.z - lastEngine.z) / Math.max(dt, 1e-3); engineSpeed += (sp - engineSpeed) * Math.min(1, dt * 3); audio.trainSpeed(Math.min(1, engineSpeed / 10)); if (wasStopped && engineSpeed > 0.6 && d < 90) audio.play('whistle', Math.max(0.2, 1 - d / 90)); wasStopped = engineSpeed < 0.2; }
+        lastEngine = e.clone(); }
+    } else { lv.cave = 0.55; const R = L.under.rooms.find((r) => r.id === 'chocolate_reservoir'), pl = R.pool; lv.water = Math.max(0, 1 - Math.hypot(p.x - (pl.x0 + pl.x1) / 2, p.z - (pl.z0 + pl.z1) / 2) / 40) * 0.6; lv.waterfall = lv.water * 0.6; }
+    if (a && BED_OF[a.id]) lv[BED_OF[a.id]] = Math.max(lv[BED_OF[a.id]], 0.55);
+    for (const b of BEDS) audio.level(b, lv[b]); audio._lv = lv;
+    audio.update(dt);
+  }
+
+  // ---------- floors: what is visible where ----------
+  const floorOf = (y) => (y < -3.5 ? 'under' : y > 9 ? 'first' : 'ground');
+  const FLOOR_LABEL = { ground: 'Ground floor · factory city', first: 'First floor · operations', under: 'Underground · the forgotten foundation' };
+  let viewFloor = null, freeShowAll = true;
+  function applyFloor(f, force) {
+    if (f === viewFloor && !force) return; viewFloor = f;
+    const free = walker.mode === 'free';
+    W.floors.under.visible = free ? freeShowAll || f === 'under' : f === 'under';
+    W.floors.ground.visible = free ? freeShowAll || f !== 'under' : f !== 'under';
+    W.floors.first.visible = free ? freeShowAll || f !== 'under' : f !== 'under';
+    W.floors.shaft.visible = true;
+    if (window.__only) for (const k of Object.keys(W.floors)) W.floors[k].visible = window.__only.includes(k);
+    const ug = f === 'under' && !free;
+    isUG = ug; sky.visible = skyNight.visible = stars.visible = moon.visible = !ug; for (const cl of clouds) cl.visible = !ug; scene.fog.near = ug ? 12 : 220; scene.fog.far = ug ? 90 : 800; scene.background = ug ? new T.Color(0x0b0810) : null; lantern.intensity = ug ? 14 : 0;
+    if (ug) { scene.fog.color.set(0x120c18); hemi.intensity = 0.28; hemi.color.set(0x9b8cff); sun.intensity = 0; for (const l of lampLights) l.intensity = 0; } else applyLight(10);
+    $('#floorName').textContent = FLOOR_LABEL[f]; mapFloor = f; document.querySelectorAll('#map button').forEach((b) => b.classList.toggle('on', b.dataset.f === f));
+  }
+
+  // ---------- areas, toast, checklist ----------
+  const visited = new Set(JSON.parse((() => { try { return localStorage.getItem('zw-visited-' + L.id) || '[]'; } catch { return '[]'; } })()));
+  let toastT = 0; function toast(s) { const el = $('#toast'); el.textContent = s; el.style.opacity = 1; clearTimeout(toastT); toastT = setTimeout(() => { el.style.opacity = 0; }, 2200); }
+  function onArea(a) {
+    $('#areaName').textContent = a ? (a.num ? `${a.num} · ${a.name}` : a.name) : (viewFloor === 'ground' ? 'Factory grounds' : '—');
+    if (a) { toast(a.num ? `${a.num} · ${a.name}` : a.name); if (!visited.has(a.id)) { visited.add(a.id); try { localStorage.setItem('zw-visited-' + L.id, JSON.stringify([...visited])); } catch { /* private mode */ } renderPanel(); } }
+  }
+  const PLACES = L.places;   // the checklist: every numbered place on all three floors
+  function renderPanel() {
+    const done = PLACES.filter((p) => visited.has(p.id)).length;
+    const grp = (f, title) => `<h3>${title}</h3>` + PLACES.filter((p) => p.floor === f).sort((a, b) => a.num - b.num).map((p) => `<div class="it" data-go="${p.id}"><span class="n">${p.num || '•'}</span>${p.name}${visited.has(p.id) ? '<span class="ok">✓</span>' : ''}</div>`).join('');
+    const anc = (f) => W.anchors.filter((a) => a.floor === f).map((a) => `<div class="it" data-anchor="${a.id}"><span class="n" style="background:#0ea5e9">📷</span>${a.id} · ${a.label}</div>`).join('');
+    $('#panel').innerHTML = `<h2>Zungga Chocolate Factory</h2><div class="prog">${done} of ${PLACES.length} places visited · click a place to go there</div>
+      <div class="btns"><button id="bFree">Free camera (F)</button><button class="ghost" id="bShot">Photo (P)</button><button class="ghost" id="bNote">Note (N)</button><button class="ghost" id="bReset">Reset checklist</button></div>
+      ${grp('ground', 'Ground floor')}${grp('first', 'First floor')}${grp('under', 'Underground')}
+      <h3>Camera anchors</h3>${anc('ground')}${anc('first')}${anc('under')}
+      <h3>Notes</h3><div id="notesList" class="prog">…</div>`;
+    $('#bFree').onclick = () => walker.toggleFree(); $('#bShot').onclick = shot; $('#bNote').onclick = openNote; if (!STUDIO) { $('#bNote').style.display = 'none'; } $('#bReset').onclick = () => { visited.clear(); try { localStorage.removeItem('zw-visited-' + L.id); } catch { /* */ } renderPanel(); };
+    document.querySelectorAll('[data-go]').forEach((el) => el.onclick = () => goPlace(el.dataset.go));
+    document.querySelectorAll('[data-anchor]').forEach((el) => el.onclick = () => { const a = W.anchors.find((x) => x.id === el.dataset.anchor); walker.view(a.pos, a.look); applyFloor(floorOf(a.pos[1]), true); });
+    loadNotes();
+  }
+  // standing spot for every place: door of the building / room centre / known spots
+  function spotFor(id) {   // where the kid lands: the building door / the place's story spot (layout.js)
+    const G = L.ground, b = G.buildings.find((x) => x.id === id);
+    if (b) { const o = { n: [0, -1], s: [0, 1], e: [1, 0], w: [-1, 0] }[b.door]; const dd = (b.door === 'e' || b.door === 'w' ? b.w : b.d) / 2; return [b.x + o[0] * (dd + 2.5), 0.05, b.z + o[1] * (dd + 2.5), Math.atan2(-o[0], -o[1])]; }
+    const p = L.places.find((x) => x.id === id); if (!p) return null;
+    return [p.spot[0], p.spot[1] + 0.02, p.spot[2] + (p.floor === 'first' ? 2 : 0), Math.PI];
+  }
+  function goPlace(id) { const s = spotFor(id); if (!s) return; if (walker.mode === 'free') walker.toggleFree(); walker.teleport([s[0], s[1] + 0.05, s[2]], s[3]); applyFloor(floorOf(s[1]), true); $('#panel').classList.remove('open'); }
+
+  // ---------- minimap ----------
+  const mm = $('#mm'), mx = mm.getContext('2d'); let mapFloor = 'ground';
+  document.querySelectorAll('#map button').forEach((b) => b.onclick = () => { mapFloor = b.dataset.f; document.querySelectorAll('#map button').forEach((x) => x.classList.toggle('on', x === b)); });
+  const B = L.bounds, S = 236 / Math.max(B.x1 - B.x0, B.z1 - B.z0), toMap = (x, z) => [2 + (x - B.x0) * S, 2 + (z - B.z0) * S];
+  const FCOL = { ground: '#fde68a', first: '#ddd6fe', under: '#57534e' };
+  function drawMap() {
+    mx.clearRect(0, 0, 240, 240); mx.fillStyle = mapFloor === 'under' ? '#1c1917' : '#a7d98a'; mx.fillRect(0, 0, 240, 240);
+    if (mapFloor === 'ground') {
+      mx.strokeStyle = '#8b5a3c'; mx.lineWidth = L.ground.river.width * S; mx.lineCap = 'round'; mx.beginPath(); L.ground.river.points.forEach(([x, z], i) => { const [a, b] = toMap(x, z); i ? mx.lineTo(a, b) : mx.moveTo(a, b); }); mx.stroke();
+      const lp = L.ground.boulevard.loop; mx.strokeStyle = '#e2b77c'; mx.lineWidth = lp.w * S; const [a0, b0] = toMap(lp.x0, lp.z0), [a1, b1] = toMap(lp.x1, lp.z1); mx.beginPath(); mx.roundRect(a0, b0, a1 - a0, b1 - b0, lp.r * S); mx.stroke();
+      const tk = L.ground.track; mx.strokeStyle = '#6b7280'; mx.lineWidth = 1.5; const [c0, d0] = toMap(tk.x0, tk.z0), [c1, d1] = toMap(tk.x1, tk.z1); mx.beginPath(); mx.roundRect(c0, d0, c1 - c0, d1 - d0, tk.r * S); mx.stroke();
+      const [px, pz] = toMap(0, -12); mx.fillStyle = '#e9c99a'; mx.beginPath(); mx.arc(px, pz, 15 * S, 0, 7); mx.fill();
+    }
+    if (mapFloor === 'first') { const o = L.first.outline, [a0, b0] = toMap(o.x0, o.z0), [a1, b1] = toMap(o.x1, o.z1); mx.fillStyle = '#c9a77c'; mx.fillRect(a0, b0, a1 - a0, b1 - b0); const g = L.first.balcony.glass, [g0, h0] = toMap(g.x0, g.z0), [g1, h1] = toMap(g.x1, g.z1); mx.fillStyle = '#bfe8ff'; mx.fillRect(g0, h0, g1 - g0, h1 - h0); }
+    for (const a of W.areas) {
+      if (a.floor !== mapFloor && !(mapFloor === 'under' && a.floor === 'shaft')) continue; if (a.w < 2 || (!a.num && !/tower|shaft/.test(a.id))) continue; if (a.id === 'cookie_boulevard') continue;
+      const p = a.pts.map(([x, z]) => toMap(x, z)); mx.fillStyle = visited.has(a.id) ? '#c4b5fd' : FCOL[mapFloor]; mx.strokeStyle = '#3b0764'; mx.lineWidth = 1; mx.beginPath(); p.forEach(([x, y], i) => i ? mx.lineTo(x, y) : mx.moveTo(x, y)); mx.closePath(); mx.fill(); mx.stroke();
+      if (a.num) { const [cx, cy] = toMap(a.x, a.z); mx.fillStyle = '#7c3aed'; mx.beginPath(); mx.arc(cx, cy, 7, 0, 7); mx.fill(); mx.fillStyle = '#fff'; mx.font = '600 9px Fredoka'; mx.textAlign = 'center'; mx.textBaseline = 'middle'; mx.fillText(a.num, cx, cy + 0.5); }
+    }
+    for (const n of notes) if (floorOf(n.pos[1]) === mapFloor) { const [x, y] = toMap(n.pos[0], n.pos[2]); mx.fillStyle = '#ef4444'; mx.beginPath(); mx.arc(x, y, 3, 0, 7); mx.fill(); }
+    if (floorOf(walker.pos.y) === mapFloor || walker.mode === 'free') { const p = walker.mode === 'free' ? camera.position : walker.pos, [x, y] = toMap(p.x, p.z), yw = walker.mode === 'free' ? Math.atan2(-camera.getWorldDirection(new T.Vector3()).x, -camera.getWorldDirection(new T.Vector3()).z) + Math.PI : walker.yaw; mx.save(); mx.translate(x, y); mx.rotate(-yw + Math.PI); mx.fillStyle = '#ef4444'; mx.strokeStyle = '#fff'; mx.lineWidth = 2; mx.beginPath(); mx.moveTo(0, -8); mx.lineTo(5.5, 6); mx.lineTo(0, 3); mx.lineTo(-5.5, 6); mx.closePath(); mx.stroke(); mx.fill(); mx.restore(); }
+  }
+
+  // ---------- notes (saved through the studio server into the world folder) ----------
+  let notes = [];
+  async function loadNotes() { try { const r = await fetch('/api/world-notes/' + L.id); notes = r.ok ? await r.json() : []; } catch { notes = []; } const el = $('#notesList'); if (el) el.innerHTML = notes.length ? notes.slice().reverse().map((n) => `<div class="it" data-note="${n.id}"><span class="n" style="background:#ef4444">!</span>${n.text.replace(/</g, '&lt;')}<small style="margin-left:auto;color:#999">${n.area || ''}</small></div>`).join('') : 'No notes yet — press N anywhere.'; document.querySelectorAll('[data-note]').forEach((e) => e.onclick = () => { const n = notes.find((x) => x.id === e.dataset.note); if (n) { walker.view(n.cam.pos, n.cam.look); applyFloor(floorOf(n.pos[1]), true); } }); }
+  function openNote() { const a = walker.area; $('#noteWhere').textContent = `${a ? a.name : 'Factory grounds'} · ${FLOOR_LABEL[floorOf(walker.pos.y)]}`; $('#noteBox').style.display = 'block'; $('#noteText').value = ''; setTimeout(() => $('#noteText').focus(), 20);  }
+  $('#noteCancel').onclick = () => { $('#noteBox').style.display = 'none'; };
+  $('#noteSave').onclick = async () => {
+    const text = $('#noteText').value.trim(); if (!text) return; const p = walker.mode === 'free' ? camera.position : walker.pos, look = camera.position.clone().add(camera.getWorldDirection(new T.Vector3()).multiplyScalar(4));
+    const n = { text, pos: [+p.x.toFixed(2), +p.y.toFixed(2), +p.z.toFixed(2)], area: walker.area ? walker.area.name : '', areaId: walker.area ? walker.area.id : '', cam: { pos: camera.position.toArray().map((v) => +v.toFixed(2)), look: look.toArray().map((v) => +v.toFixed(2)) }, mode: walker.mode, image: renderer.domElement.toDataURL('image/jpeg', 0.7) };
+    try { const r = await fetch('/api/world-notes/' + L.id, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(n) }); if (!r.ok) throw new Error(await r.text()); toast('Note saved'); } catch (e) { toast('Could not save the note (is the studio server running?)'); }
+    $('#noteBox').style.display = 'none'; loadNotes();
+  };
+  function shot() { const a = document.createElement('a'); a.href = renderer.domElement.toDataURL('image/png'); a.download = `factory-${(walker.area && walker.area.id) || 'view'}-${Date.now()}.png`; a.click(); }
+
+  // ---------- keys ----------
+  addEventListener('keydown', (e) => {
+    if (/INPUT|TEXTAREA/.test(e.target.tagName)) { if (e.key === 'Escape') $('#noteBox').style.display = 'none'; return; }
+    if (e.code === 'KeyM' || e.code === 'Tab') { $('#panel').classList.toggle('open'); e.preventDefault();  }
+    if (e.code === 'KeyN' && STUDIO) { e.preventDefault(); openNote(); }
+    if (e.code === 'KeyP') shot();
+    if (e.code === 'KeyL') setNight(DNt < 0.5);
+    if (e.code === 'KeyK') { audio.muted = !audio.muted; toast(audio.muted ? 'Sound off (K)' : 'Sound on (K)'); }
+    if (e.code === 'KeyC' && walker.mode === 'free') { W.ceilings.forEach((m) => { m.visible = !m.visible; }); }
+    if (e.code === 'KeyV' && walker.mode === 'free') { freeShowAll = !freeShowAll; applyFloor(viewFloor, true); }
+    if (e.code === 'KeyF') setTimeout(() => applyFloor(floorOf(walker.mode === 'free' ? camera.position.y : walker.pos.y), true), 0);
+  });
+  $('#menuBtn').onclick = () => $('#panel').classList.toggle('open');
+
+  // ---------- resize + loop ----------
+  function resize() { const w = innerWidth, h = innerHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); }
+  addEventListener('resize', resize); resize();
+  let last = performance.now(), time = 0, frames = 0, fpsT = 0, cullT = 1;
+  let paused = false;
+  // simulate: steer the kid through waypoints [[x, z], …] (or { use: true } / { jump: true } / { wait: s }) at 60 Hz; returns a trace
+  function sim(steps, { maxT = 120, run = false, tol = 0.35 } = {}) {
+    paused = true; const trace = []; let i = 0, simT = 0, waitT = 0; const dt = 1 / 60;
+    while (i < steps.length && simT < maxT) {
+      const st = steps[i];
+      if (st.use) { walker.use(); walker.setInput({ f: 0, r: 0, run: false }); walker.update(dt); W.update(time += dt, dt, walker.pos); simT += dt; i++; continue; }
+      if (st.jump) { walker.jump(); i++; continue; }
+      if (st.wait != null) { walker.setInput({ f: 0, r: 0, run: false }); walker.update(dt); W.update(time += dt, dt, walker.pos); simT += dt; waitT += dt; if (waitT >= st.wait) { waitT = 0; i++; } continue; }
+      const dx = st[0] - walker.pos.x, dz = st[1] - walker.pos.z, d = Math.hypot(dx, dz);
+      if (d < (st[2] ?? tol)) { i++; continue; }
+      walker.setHeading(Math.atan2(dx, dz)); walker.setInput({ f: 1, r: 0, run });
+      walker.update(dt); W.update(time += dt, dt, walker.pos); simT += dt;
+      if (Math.round(simT * 60) % 15 === 0) trace.push([+walker.pos.x.toFixed(2), +walker.pos.y.toFixed(2), +walker.pos.z.toFixed(2), walker.mode]);
+    }
+    walker.setInput(null); paused = false;
+    return { done: i >= steps.length, step: i, t: +simT.toFixed(1), end: [+walker.pos.x.toFixed(2), +walker.pos.y.toFixed(2), +walker.pos.z.toFixed(2)], mode: walker.mode, trace };
+  }
+  function frame(now) {
+    const dt = Math.min(0.05, (now - last) / 1000); last = now; if (paused) { requestAnimationFrame(frame); return; } time += dt;
+    walker.update(dt); W.update(time, dt, walker.pos); updateAudio(dt); applyLight(dt); if ((cullT += dt) > 0.25) { cullT = 0; W.cull(camera.position, walker.mode === 'free' ? 80 : 55); } if (crowd) crowd.update(time, dt, walker.mode === 'free' ? camera.position : walker.pos); updateDropped(dt); for (const h of hooks) h(dt);
+    const ref = walker.mode === 'free' ? camera.position : walker.pos;
+    applyFloor(floorOf(walker.mode === 'free' ? camera.position.y : walker.pos.y));
+    sun.position.set(ref.x + 30, ref.y + 60, ref.z + 22); sun.target.position.set(ref.x, ref.y, ref.z); sun.target.updateMatrixWorld();
+    lantern.position.set(walker.pos.x, walker.pos.y + 2.2, walker.pos.z);
+    renderer.render(scene, camera);
+    frames++; fpsT += dt; if (fpsT > 0.5) { $('#fps').textContent = `${Math.round(frames / fpsT)} fps · ${renderer.info.render.calls} draws`; frames = 0; fpsT = 0; drawMap(); }
+    requestAnimationFrame(frame);
+  }
+  renderPanel(); applyFloor('ground', true);
+  if (startArea) { if (W.anchors.find((a) => a.id === startArea)) { const a = W.anchors.find((x) => x.id === startArea); walker.view(a.pos, a.look); applyFloor(floorOf(a.pos[1]), true); } else goPlace(startArea); }
+  if (q.get('ceil') === '0') W.ceilings.forEach((m) => { m.visible = false; });
+  if (q.get('only')) { const keep = q.get('only').split(','); setTimeout(() => { for (const k of Object.keys(W.floors)) W.floors[k].visible = keep.includes(k); }, 50); window.__only = keep; }
+  if (q.get('cam')) { const [px, py, pz, lx, ly, lz] = q.get('cam').split(',').map(Number); walker.view([px, py, pz], [lx, ly, lz]); applyFloor(floorOf(py), true); }
+  // ---------- the school bus: arriving from the island (?from=island&back=…) and riding back ----------
+  const backURL = q.get('back') || (STUDIO ? null : '../../index.html?play&from=factory');   // on the resume site the bus always goes back to the island
+  const hooks = [];   // per-frame extras (golden gate, bus flight)
+  const dropped = [];   // kids the bus drops off (they walk into the factory)
+  // the school bus: always parked at the stop by the south gate (ride it back to the island); arriving from the island it drives in and drops you off
+  let bus = null, busCol = null, busBusy = false;
+  const BUS = W.busStop ? { stopZ: L.bounds.z1 - 8, laneX: -1.6 } : null;
+  if (BUS) {
+    if (ZAssets.has('school_bus')) { bus = ZAssets.build('school_bus').group; bus.updateMatrixWorld(true); const bb = new T.Box3().setFromObject(bus), sx = bb.max.x - bb.min.x, sz = bb.max.z - bb.min.z; const k = 9 / Math.max(sx, sz); bus.scale.multiplyScalar(k); if (sx > sz) bus.rotation.y = Math.PI / 2; }
+    else { bus = new T.Group(); const m = new T.Mesh(new T.BoxGeometry(2.5, 2.8, 9.5), new T.MeshStandardMaterial({ color: 0xfacc15 })); m.position.y = 1.6; bus.add(m); }
+    bus.traverse((o) => { if (o.isMesh) o.castShadow = true; }); W.floors.ground.add(bus); bus.position.set(BUS.laneX, 0, BUS.stopZ);
+    busCol = W.frame('ground', BUS.laneX, BUS.stopZ, 0).col(2.8, 3.2, 9.8, 0, 0, 0);   // the parked bus is solid
+    W.interacts.unshift({ test: (p) => !busBusy && Math.abs(p.x - (BUS.laneX + 2.2)) < 2.2 && Math.abs(p.z - (BUS.stopZ + 1.2)) < 3 && p.y < 2, label: () => 'Ride the school bus back to the island', fn: () => dispatchEvent(new CustomEvent('zworld-bus')) });
+  }
+  const gatesOpen = (sec) => { const until = performance.now() + sec * 1000; (function g() { for (const D of W.busGate || []) D.want = 1; if (performance.now() < until) requestAnimationFrame(g); })(); };
+  // ---------- the sky-high school bus: it flies (island → factory: night flight, circles the factory, lands at dawn; and back) ----------
+  let rig = null, busTrail = null;
+  if (bus) {
+    rig = new T.Group(); rig.position.copy(bus.position); bus.position.set(0, 0, 0); W.floors.ground.remove(bus); rig.add(bus); W.floors.ground.add(rig);
+    const lampM = new T.MeshBasicMaterial({ color: 0xfff4c0 }); for (const sx of [-0.8, 0.8]) { const hl = new T.Mesh(new T.SphereGeometry(0.17, 12, 8), lampM); hl.position.set(sx, 1.0, -4.55); rig.add(hl); }
+    const headL = new T.SpotLight(0xfff1c8, 0, 60, 0.5, 0.6, 1.2); headL.position.set(0, 1.2, -4.4); headL.target.position.set(0, -2, -20); rig.add(headL, headL.target); rig.userData.headL = headL;
+    const glowL = new T.PointLight(0xffd27a, 0, 16, 1.6); glowL.position.set(0, 2, 0); rig.add(glowL); rig.userData.glowL = glowL;
+    const TN = 90, tg = new T.BufferGeometry(), tp = new Float32Array(TN * 3); tg.setAttribute('position', new T.BufferAttribute(tp, 3));
+    busTrail = new T.Points(tg, new T.PointsMaterial({ color: 0xffe08a, size: 0.35, transparent: true, opacity: 0.85, depthWrite: false, blending: T.AdditiveBlending, fog: false })); busTrail.frustumCulled = false; busTrail.visible = false; scene.add(busTrail); busTrail.userData.i = 0;
+  }
+  const lerpA = (a, b, k) => a + Math.atan2(Math.sin(b - a), Math.cos(b - a)) * k, smooth = (x) => { x = Math.min(1, Math.max(0, x)); return x * x * (3 - 2 * x); };
+  function poseBus(p, dir, bank, dt) {   // nose along dir (the bus nose is local −z), banked into turns
+    rig.position.copy(p); const yaw = Math.atan2(-dir.x, -dir.z), pitch = Math.atan2(dir.y, Math.hypot(dir.x, dir.z));
+    rig.rotation.order = 'YXZ'; rig.rotation.y = lerpA(rig.rotation.y, yaw, Math.min(1, dt * 6)); rig.rotation.x += (pitch - rig.rotation.x) * Math.min(1, dt * 4); rig.rotation.z += (bank - rig.rotation.z) * Math.min(1, dt * 2.5);
+  }
+  function trail(on, dt) { if (!busTrail) return; busTrail.visible = on; if (!on) return; const a = busTrail.geometry.attributes.position, tp = a.array, n = tp.length / 3; for (let k = 0; k < n; k++) tp[k * 3 + 1] -= dt * 0.6; const k = busTrail.userData.i = (busTrail.userData.i + 1) % n, back = new T.Vector3(0, 1.2, 4.6).applyEuler(rig.rotation).add(rig.position); tp[k * 3] = back.x + (Math.random() - 0.5) * 1.6; tp[k * 3 + 1] = back.y + (Math.random() - 0.5) * 1.2; tp[k * 3 + 2] = back.z + (Math.random() - 0.5) * 1.6; a.needsUpdate = true; }
+  const cine = (on) => { document.body.classList.toggle('cine', on); walker.paused = on; if (!on) walker.setCine(null); };
+  let skipNow = false; addEventListener('keydown', (e) => { if (e.code === 'Space' && document.body.classList.contains('cine')) { skipNow = true; e.preventDefault(); e.stopPropagation(); } }, true);
+  // the parked bus drops the kid + friends off (friends wait by the fountain: the golden gate is for pass holders)
+  function dropOff() {
+    const stopZ = BUS.stopZ, doorX = BUS.laneX + 1.9; busCol.on = true; busBusy = false; cine(false);
+    if (walker.mode === 'free') walker.toggleFree(); walker.teleport([doorX + 0.6, 0.05, stopZ + 0.4], Math.PI); kid.group.visible = true; walker.setInput({ f: 1, r: 0, run: false }); setTimeout(() => walker.setInput(null), 2400);   // steps off and heads for the fountain + the golden gate
+    toast('Welcome to the Zungga Chocolate Factory! 🍫 Show your golden pass at the gate ✨'); audio.play('chime', 1);
+    const others = ['friend_boy', 'friend_girl', 'best_friend'], o = L.ground.entrance.outer;
+    others.forEach((who, k) => setTimeout(() => { const n = k + 1, ch = ZCharacters.toon({ ...ZCharacters.TOON_PRESETS[who] }); ch.group.traverse((m) => { if (m.isMesh) m.castShadow = true; }); W.floors.ground.add(ch.group); const a = 0.5 + n * 0.85;
+      dropped.push({ ch, path: [[doorX + 1.6, stopZ + 1.2 - n * 0.3], [doorX + 3 + n, stopZ - 5], [o.x + (n - 2) * 3, o.z + 9], [o.x + Math.sin(a) * 5, o.z + Math.cos(a) * 5]], i: 0, x: doorX, z: stopZ + 1.2, yaw: Math.PI / 2 }); }, 700 + k * 900));
+  }
+  if (bus && q.get('from') === 'island') {
+    const B = L.bounds, stopZ = BUS.stopZ, lx = BUS.laneX, z1 = B.z1; busBusy = true; busCol.on = false; kid.group.visible = false; cine(true);
+    DNrate = 50; setNight(true); setTimeout(() => { DNrate = 0.9; }, 300);
+    // through-the-clouds puffs on the way in
+    const puff = new T.MeshStandardMaterial({ color: 0xffffff, roughness: 1, fog: false, transparent: true, opacity: 0.9 }), puffs = [];
+    for (const [x, y, z] of [[-48, 132, z1 + 360], [-30, 122, z1 + 300], [-12, 112, z1 + 245], [20, 104, z1 + 200]]) for (let k = 0; k < 5; k++) { const m = new T.Mesh(new T.SphereGeometry(9 + Math.random() * 7, 14, 10), cloudM); m.position.set(x + (Math.random() - 0.5) * 22, y + (Math.random() - 0.5) * 5, z + (Math.random() - 0.5) * 16); m.scale.y = 0.6; scene.add(m); puffs.push(m); }
+    void puff;
+    const R = 165, ring = [0.45, 1.15, 1.85, 2.55, 3.25, 3.95, 4.65, 5.3].map((a, k) => [Math.sin(a) * R, 64 - k * 1.5, Math.cos(a) * R]);
+    const P = [[-60, 140, z1 + 430], [-30, 122, z1 + 300], [10, 106, z1 + 205], [55, 84, z1 + 120], ...ring, [-70, 46, z1 + 150], [-28, 32, z1 + 150], [lx, 20, z1 + 105], [lx, 8, z1 + 55], [lx, 1.6, z1 + 18], [lx, 0, z1 - 1]].map((v) => new T.Vector3(...v));
+    const curve = new T.CatmullRomCurve3(P, false, 'centripetal', 0.5), cl = curve.getLength();
+    const chord = [0]; for (let k = 1; k < P.length; k++) chord.push(chord[k - 1] + P[k].distanceTo(P[k - 1])); const sAt = (k) => chord[k] / chord[chord.length - 1], sC0 = sAt(4), sC1 = sAt(11);
+    const TF = Math.max(34, Math.min(42, cl / 52)), TR = 5.5, ground = new T.Vector3(lx - 9, 2.4, stopZ - 11), cp = new T.Vector3(), lk = new T.Vector3(), up = new T.Vector3(0, 1, 0);
+    let t = 0, dawn = false, done = false, prevDir = new T.Vector3(0, 0, -1);
+    rig.userData.headL.intensity = 40; rig.userData.glowL.intensity = 6;
+    walker.setCine(() => ({ pos: cp, look: lk, fov: 60 }));
+    hooks.push(function fly(dt) {
+      if (done) return; if (skipNow) { skipNow = false; t = TF + TR; }
+      t += dt; const x = Math.min(1, t / TF), sp = 0.5 - 0.5 * Math.cos(Math.PI * x), p = curve.getPointAt(sp), dir = curve.getTangentAt(Math.min(0.999, sp)).normalize();
+      if (t < TF) {
+        const turn = Math.atan2(prevDir.x * dir.z - prevDir.z * dir.x, prevDir.dot(dir)) / Math.max(dt, 1e-3); prevDir.copy(dir); const bank = Math.max(-0.45, Math.min(0.45, -turn * 0.9)) * (1 - smooth((t - TF + 6) / 5));
+        poseBus(p, dir, bank, dt); trail(true, dt);
+      } else {   // touched down: roll gently to the stop, nose to the factory
+        const r = Math.min(1, (t - TF) / TR), e = 1 - (1 - r) * (1 - r); poseBus(new T.Vector3(lx, 0, (z1 - 1) + (stopZ - (z1 - 1)) * e), new T.Vector3(0, 0, -1), 0, dt); trail(false, dt); if (r > 0.05) gatesOpen(2);
+      }
+      if (!dawn && t > TF - 13) { dawn = true; DNrate = 0.22; setNight(false); setTimeout(() => { DNrate = 0.9; }, 14000); }
+      // camera: chase → orbiting outside the ring (the lit factory below) → chase → standing at the stop watching it land
+      const side = new T.Vector3().crossVectors(up, dir).normalize(), chaseP = rig.position.clone().addScaledVector(dir, -15).addScaledVector(up, 4.5).addScaledVector(side, 6.5), chaseL = rig.position.clone().addScaledVector(dir, 8);
+      const out = new T.Vector3(rig.position.x, 0, rig.position.z).normalize(), orbP = rig.position.clone().addScaledVector(out, 24).addScaledVector(up, 7).addScaledVector(dir, -8), orbL = rig.position.clone().lerp(new T.Vector3(0, 0, 0), 0.3);
+      const wOrb = smooth((sp - sC0) / 0.04) * (1 - smooth((sp - sC1 + 0.03) / 0.04)), wGround = smooth((t - (TF - 9)) / 3.5);
+      const A = chaseP.lerp(orbP, wOrb), Lk = chaseL.lerp(orbL, wOrb); A.lerp(ground, wGround); Lk.lerp(rig.position.clone().add(new T.Vector3(0, 1.4, 0)), wGround);
+      if (t < 0.05) { cp.copy(A); lk.copy(Lk); } else { const k = 1 - Math.exp(-dt * 3); cp.lerp(A, k); lk.lerp(Lk, k); }
+      if (t >= TF + TR + 0.6) { done = true; rig.userData.headL.intensity = 0; rig.userData.glowL.intensity = 0; trail(false, dt); puffs.forEach((m) => scene.remove(m)); DNrate = 0.9; if (DNt > 0.5) setNight(false); dropOff(); }
+    });
+  }
+  addEventListener('zworld-bus', () => {
+    if (!bus || busBusy) return; busBusy = true;
+    if (!backURL) { toast('This bus goes to the island — open Play mode on the resume site to ride it 🚌'); busBusy = false; return; }
+    toast('All aboard! Back to the island 🚌'); audio.play('whistle', 1); kid.group.visible = false; busCol.on = false; gatesOpen(6); cine(true);
+    const B = L.bounds, lx = BUS.laneX, z0 = BUS.stopZ, cam = new T.Vector3(lx - 10, 2.6, z0 - 12), cp = cam.clone(), lk = new T.Vector3(lx, 1.5, z0), up = new T.Vector3(0, 1, 0);
+    const P = [[lx, 2.2, z0], [lx, 4.5, z0 + 7], [lx, 14, B.z1 + 40], [16, 50, B.z1 + 150], [48, 105, B.z1 + 300], [80, 150, B.z1 + 480]].map((v) => new T.Vector3(...v));
+    const curve = new T.CatmullRomCurve3(P, false, 'centripetal'); let t = 0, done = false, faded = false; const TF = 13, y0 = rig.rotation.y;
+    rig.userData.headL.intensity = 40; rig.userData.glowL.intensity = 6; walker.setCine(() => ({ pos: cp, look: lk, fov: 60 }));
+    hooks.push(function away(dt) {
+      if (done) return; if (skipNow) { skipNow = false; t = TF; }
+      t += dt;
+      if (t < 2.4) { const k = smooth(t / 2.4); rig.position.set(lx, k * 2.2, z0); rig.rotation.y = y0 + Math.PI * k; rig.rotation.z = Math.sin(t * 3) * 0.04; }   // lift off and turn round, south
+      else { const x = Math.min(1, (t - 2.4) / (TF - 2.4)), sp = x * x * (1.4 - 0.4 * x), p = curve.getPointAt(Math.min(1, sp)), dir = curve.getTangentAt(Math.min(0.999, sp)).normalize(); poseBus(p, dir, 0, dt); trail(true, dt); }
+      const chase = rig.position.clone().add(new T.Vector3(-7, 3, -16)), w = smooth((t - 5) / 3); lk.lerp(rig.position.clone().add(new T.Vector3(0, 1.4, 0)), 1 - Math.exp(-dt * 4)); cp.lerp(cam.clone().lerp(chase, w), 1 - Math.exp(-dt * 2.5)); void up;
+      if (!faded && t > TF - 1.6) { faded = true; $('#fade').style.opacity = 1; }
+      if (t >= TF) { done = true; setTimeout(() => { location.href = backURL; }, faded ? 900 : 0); }
+    });
+  });
+  // ---------- the golden gate: E → the kid raises the golden visitor pass, energy flows to the gate, it opens ----------
+  if (W.goldenGate) {
+    const GG = W.goldenGate, cardTex = ZA.label('★ GOLDEN PASS ★', { w: 512, h: 320, bg: '#f5c518', fg: '#5b2a86', size: 64, radius: 30 });
+    const card = new T.Mesh(new T.BoxGeometry(0.34, 0.22, 0.02), [0, 0, 0, 0, 0, 0].map((_, k) => k >= 4 ? new T.MeshStandardMaterial({ map: cardTex, emissive: 0xffc83a, emissiveMap: cardTex, emissiveIntensity: 0.6, metalness: 0.4, roughness: 0.3 }) : new T.MeshStandardMaterial({ color: 0xf5c518, emissive: 0xffb300, emissiveIntensity: 0.6, metalness: 0.7, roughness: 0.25 })));
+    card.position.y = -0.38; card.scale.setScalar(1.4);   // held up high above the big head, on a little golden handle
+    const handle = new T.Mesh(new T.CylinderGeometry(0.012, 0.012, 0.2, 8), new T.MeshStandardMaterial({ color: 0xf5c518, metalness: 0.8, roughness: 0.25 })); handle.position.y = 0.17; card.add(handle);
+    const halo = new T.Mesh(new T.SphereGeometry(0.16, 16, 12), new T.MeshBasicMaterial({ color: 0xffd23a, transparent: true, opacity: 0, blending: T.AdditiveBlending, depthWrite: false })); card.add(halo);
+    const cardLight = new T.PointLight(0xffd54a, 0, 6, 1.5); card.add(cardLight);
+    const EN = 90, eg = new T.BufferGeometry(), ep = new Float32Array(EN * 3); eg.setAttribute('position', new T.BufferAttribute(ep, 3));
+    const energy = new T.Points(eg, new T.PointsMaterial({ color: 0xffd23a, size: 0.14, transparent: true, opacity: 0, blending: T.AdditiveBlending, depthWrite: false })); energy.frustumCulled = false; scene.add(energy);
+    const orb = new T.Mesh(new T.SphereGeometry(0.3, 20, 14), new T.MeshBasicMaterial({ color: 0xffc83a, transparent: true, opacity: 0, blending: T.AdditiveBlending, depthWrite: false })); orb.position.set(GG.x, GG.h * 0.5, GG.z); scene.add(orb);
+    let cer = null, gateT = 0;
+    addEventListener('zworld-pass', () => {
+      if (cer || GG.isOpen) return; GG.busy = true; const p = walker.pos, h = Math.atan2(GG.x - p.x, (GG.z) - p.z); walker.setHeading(h);
+      kid.hold(card, 'R'); const toward = new T.Vector3(GG.x - p.x, 0, GG.z - p.z).normalize(), perp = new T.Vector3(toward.z, 0, -toward.x);   // the kid's right side (the hand with the pass)
+      const camP = p.clone().addScaledVector(perp, 3.0).addScaledVector(toward, 1.7).add(new T.Vector3(0, 1.2, 0)), camL = p.clone().addScaledVector(toward, 0.5).add(new T.Vector3(0, 1.75, 0)), cp = camera.position.clone(), lk = camL.clone();
+      walker.setCine((dt) => { const k = 1 - Math.exp(-dt * 3); cp.lerp(camP, k); lk.lerp(camL, k); return { pos: cp, look: lk }; });
+      cer = { t: 0, opened: false, seeds: Array.from({ length: EN }, () => [Math.random(), (Math.random() - 0.5) * 0.8, (Math.random() - 0.5) * 0.8]) };
+      walker.act('raise_pass', 3.9, () => { kid.hold(null, 'R'); walker.setCine(null); GG.busy = false; cer = null; energy.material.opacity = 0; halo.material.opacity = 0; cardLight.intensity = 0; });
+      audio.play('chime', 0.7); toast('✨ Golden visitor pass!');
+    });
+    hooks.push((dt) => {
+      if (cer) {
+        const t = (cer.t += dt), glow = smooth(t / 0.8); card.children.length; card.material.forEach((m) => { m.emissiveIntensity = 0.6 + glow * 2.2 + Math.sin(t * 14) * 0.25 * glow; }); halo.material.opacity = 0.35 * glow; halo.scale.setScalar(1 + Math.sin(t * 9) * 0.15); cardLight.intensity = 4 * glow;
+        const a = new T.Vector3(); card.getWorldPosition(a); const b = orb.position, mid = a.clone().lerp(b, 0.5).add(new T.Vector3(0, 1.6, 0));
+        const flow = smooth((t - 0.9) / 0.3) * (1 - smooth((t - 2.7) / 0.5)); energy.material.opacity = flow;
+        for (let k = 0; k < EN; k++) { const [ph, ox, oz] = cer.seeds[k], u = (t * 0.9 + ph) % 1, iu = 1 - u; const x = iu * iu * a.x + 2 * iu * u * mid.x + u * u * b.x, y = iu * iu * a.y + 2 * iu * u * mid.y + u * u * b.y, z = iu * iu * a.z + 2 * iu * u * mid.z + u * u * b.z, wob = Math.sin(u * Math.PI); ep[k * 3] = x + ox * wob; ep[k * 3 + 1] = y + Math.sin(t * 7 + ph * 9) * 0.15 * wob; ep[k * 3 + 2] = z + oz * wob; }
+        eg.attributes.position.needsUpdate = true;
+        GG.glow = smooth((t - 1.2) / 1.2) * (1 - smooth((t - 3.0) / 1.2)); orb.material.opacity = GG.glow * 0.45; orb.scale.setScalar(1 + GG.glow * 1.2 + Math.sin(t * 10) * 0.12);
+        if (!cer.opened && t > 2.45) { cer.opened = true; GG.open(); gateT = 0; audio.play('door', 1); audio.play('chime', 1); toast('The golden gate opens ✨ Welcome in!'); }
+      } else if (GG.glow > 0) { GG.glow = Math.max(0, GG.glow - dt); orb.material.opacity = GG.glow * 0.8; }
+      if (GG.isOpen && !GG.busy) { gateT += dt; const far = Math.hypot(walker.pos.x - GG.x, walker.pos.z - GG.z) > 9 || walker.pos.y > 3; if (gateT > 6 && far) GG.close(); }
+    });
+  }
+  function updateDropped(dt) {
+    for (const d of dropped) {
+      const tgt = d.path[d.i];
+      if (tgt) { const dx = tgt[0] - d.x, dz = tgt[1] - d.z, dist = Math.hypot(dx, dz); if (dist < 0.2) d.i++; else { const sp = Math.min(dist, 1.3 * dt); d.x += dx / dist * sp; d.z += dz / dist * sp; d.yaw += Math.atan2(Math.sin(Math.atan2(dx, dz) - d.yaw), Math.cos(Math.atan2(dx, dz) - d.yaw)) * Math.min(1, dt * 8); } d.ch.play('walk'); }
+      else d.ch.play(d.i % 2 ? 'talk' : 'idle');
+      const y = W.support(d.x, d.z, 1, 1.2).y; d.ch.group.position.set(d.x, y > -50 ? y : 0, d.z); d.ch.group.rotation.y = d.yaw; d.ch.update(dt);
+    }
+  }
+  $('#loading').remove();
+  // ---------- clearance audit: can the kid (r 0.35) walk from every door to the room centre? ----------
+  function clear(x0, z0, x1, z1, y, r = 0.35) {
+    const n = Math.max(2, Math.ceil(Math.hypot(x1 - x0, z1 - z0) / 0.25)), bad = [];
+    for (let i = 0; i <= n; i++) { const p = { x: x0 + (x1 - x0) * i / n, z: z0 + (z1 - z0) * i / n }, q0 = { ...p }; const sup = W.support(p.x, p.z, y + 0.3, 0.6).y; W.push(p, r, Math.max(y, sup), 1.1, 0.42); if (Math.hypot(p.x - q0.x, p.z - q0.z) > 0.02) bad.push([+q0.x.toFixed(2), +q0.z.toFixed(2)]); }
+    return bad;
+  }
+  function audit() {
+    for (const D of W.doors) if (D.auto) D.col.on = false;   // doors open for people: test the doorways themselves
+    const out = [], G = L.ground, F = L.first, U = L.under, DIR = { n: [0, -1], s: [0, 1], e: [1, 0], w: [-1, 0] };
+    for (const b of G.buildings) { const o = DIR[b.door], dd = (b.door === 'e' || b.door === 'w' ? b.w : b.d) / 2; const bad = clear(b.x + o[0] * (dd + 1.5), b.z + o[1] * (dd + 1.5), b.x + o[0] * 1.5, b.z + o[1] * 1.5, 0.13); if (bad.length) out.push({ room: b.id, door: b.door, bad: bad.slice(0, 6), n: bad.length }); }
+    for (const r of F.rooms) { const cx = (r.x0 + r.x1) / 2, cz = (r.z0 + r.z1) / 2, w = r.x1 - r.x0, d = r.z1 - r.z0; for (const [side, at] of r.doors) { const o = DIR[side], half = side === 'n' || side === 's' ? d / 2 : w / 2, ax = side === 'n' || side === 's' ? cx + at : cx + o[0] * (half + 1.2), az = side === 'n' || side === 's' ? cz + o[1] * (half + 1.2) : cz + at; const bad = clear(ax, az, cx + (side === 'n' || side === 's' ? at : 0), cz + (side === 'e' || side === 'w' ? at : 0), F.y); if (bad.length) out.push({ room: r.id, door: side, bad: bad.slice(0, 6), n: bad.length }); } }
+    for (const D of W.doors) if (D.auto) D.col.on = D.open < 0.6;
+    return out;
+  }
+  window.__world = { crowd, clear, audit, sim, W, walker, kid, camera, scene, renderer, applyFloor, goPlace, spotFor, stats, timing: { build: Math.round(built - t0), bake: Math.round(baked - built) }, floorOf };
+  window.__ready = true;
+  requestAnimationFrame(frame);
+})().catch((e) => { document.body.insertAdjacentHTML('beforeend', `<pre style="position:fixed;inset:20px;background:#fff;color:#b91c1c;z-index:99;padding:16px;overflow:auto">${e.stack}</pre>`); console.error(e); });
+</script>
+</body></html>

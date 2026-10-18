@@ -4309,5 +4309,81 @@ setTimeout(() => { // a beat later, so the loader can paint before the world is 
     (window.siteReady || Promise.resolve()).then(() => $('#btn-start').click());
   }
   try { buildPet(petKind); } catch { petKind = 'none'; } // the saved pet joins once the player exists
+  // ---------- Zungga Chocolate Factory: a school-bus stop on the lap road → the factory world (and back) ----------
+  const FACTORY_URL = 'factory/studio/world.html';
+  const BUSSTOP = (() => {
+    const DEGS = [180, 300, 185, 175, 295, 305, 120, 240];
+    const GATE_DEGS = [90, 150, 210, 270, 330, 30];
+    const r = OUTER + ROAD / 2 + 3.4;
+    for (const dg of DEGS) {
+      const a = dg * DEG, x = Math.cos(a) * r, z = Math.sin(a) * r;
+      if (GATE_DEGS.some((gd) => Math.abs(((dg - gd + 540) % 360) - 180) < 13)) continue;   // keep clear of the race checkpoints
+      if (ramps.some((q) => Math.hypot(q.x - x, q.z - z) < 40) || boosts.some((q) => Math.hypot(q.x - x, q.z - z) < 30) || Math.hypot(x - BR.cx, z - BR.cz) < BR.L / 2 + 20) continue;
+      if (connectors.some((c) => Math.abs(Math.atan2(Math.sin(Math.atan2(c.dir.z, c.dir.x) - a), Math.cos(Math.atan2(c.dir.z, c.dir.x) - a))) < 0.08)) continue;
+      return { a, x, z, h: Math.atan2(-Math.sin(a + Math.PI / 2), -Math.cos(a + Math.PI / 2)) };
+    }
+    return { a: 3.6, x: Math.cos(3.6) * r, z: Math.sin(3.6) * r, h: 0 };
+  })();
+  {
+    const g = new THREE.Group(); g.position.set(BUSSTOP.x, 0, BUSSTOP.z); g.rotation.y = Math.PI / 2 - BUSSTOP.a; scene.add(g);   // local −z faces the road (inward)
+    const purple = mat(0x6d28d9), yellow = mat(0xfacc15), glassM = mat(0x9fd8ff, { roughness: 0.1, metalness: 0.2 });
+    // the shelter: purple roof on posts, a bench, a sign
+    add(new THREE.BoxGeometry(5.2, 0.25, 2.4), purple, 0, 2.8, 0.6, g); for (const x of [-2.4, 2.4]) for (const z of [-0.4, 1.6]) add(new THREE.CylinderGeometry(0.08, 0.08, 2.8, 10), mat(0xd1d5db, { metalness: 0.6 }), x, 1.4, z, g);
+    add(new THREE.BoxGeometry(5, 2.2, 0.08), glassM, 0, 1.5, 1.7, g, false); add(new THREE.BoxGeometry(3.2, 0.12, 0.6), mat(0xb7793f), 0, 0.5, 1.2, g); for (const x of [-1.4, 1.4]) add(new THREE.BoxGeometry(0.12, 0.5, 0.5), mat(0x5b3420), x, 0.25, 1.2, g);
+    const signT = (() => { const c = document.createElement('canvas'); c.width = 1024; c.height = 300; const x = c.getContext('2d'); x.fillStyle = '#3b0764'; x.fillRect(0, 0, 1024, 300); x.fillStyle = '#ffd84a'; x.font = '900 92px system-ui'; x.textAlign = 'center'; x.fillText('ZUNGGA', 512, 115); x.font = '700 64px system-ui'; x.fillText('CHOCOLATE FACTORY', 512, 200); x.fillStyle = '#fde68a'; x.font = '600 40px system-ui'; x.fillText('🚌  school bus stop', 512, 270); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; })();
+    const sign = add(new THREE.PlaneGeometry(3.4, 1.0), new THREE.MeshStandardMaterial({ map: signT }), 0, 3.5, 0.0, g, false); sign.rotation.y = Math.PI;
+    const sign2 = sign.clone(); sign2.rotation.y = 0; sign2.position.z = 0.02; g.add(sign2);
+    add(new THREE.CylinderGeometry(0.07, 0.07, 3.2, 10), mat(0xd1d5db, { metalness: 0.6 }), 3.4, 1.6, -0.6, g); const stop = add(new THREE.CylinderGeometry(0.45, 0.45, 0.06, 8), mat(0xdc2626), 3.4, 3.2, -0.6, g); stop.rotation.x = Math.PI / 2;
+    // the school bus waiting at the kerb (on the lap road, facing along it)
+    const bus = new THREE.Group(); bus.position.set(0, 0, -4.2); g.add(bus);
+    add(new THREE.BoxGeometry(9.5, 2.6, 2.5), yellow, 0, 1.75, 0, bus); add(new THREE.BoxGeometry(9.6, 0.22, 2.56), mat(0x111827), 0, 1.25, 0, bus); add(new THREE.BoxGeometry(1.6, 1.4, 2.4), yellow, 5.2, 1.15, 0, bus);
+    for (let i = 0; i < 6; i++) for (const sz of [-1, 1]) add(new THREE.BoxGeometry(1.0, 0.8, 0.05), glassM, -3.6 + i * 1.35, 2.35, sz * 1.27, bus, false);
+    add(new THREE.BoxGeometry(0.05, 1.1, 2.0), glassM, 4.78, 2.35, 0, bus, false); add(new THREE.BoxGeometry(0.8, 2.0, 0.05), glassM, 3.8, 1.6, 1.27, bus, false);
+    for (const x of [-3, 3.3]) for (const sz of [-1, 1]) { const w = add(new THREE.CylinderGeometry(0.5, 0.5, 0.35, 18), mat(0x111827), x, 0.5, sz * 1.15, bus); w.rotation.x = Math.PI / 2; }
+    const busT = (() => { const c = document.createElement('canvas'); c.width = 1024; c.height = 160; const x = c.getContext('2d'); x.fillStyle = '#facc15'; x.fillRect(0, 0, 1024, 160); x.fillStyle = '#111827'; x.font = '900 96px system-ui'; x.textAlign = 'center'; x.fillText('ZUNGGA SCHOOL BUS', 512, 115); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; })();
+    for (const sz of [-1, 1]) { const l = add(new THREE.PlaneGeometry(6, 0.55), new THREE.MeshStandardMaterial({ map: busT }), -0.8, 2.95, sz * 1.27, bus, false); l.rotation.y = sz > 0 ? 0 : Math.PI; }
+    BUSSTOP.bus = bus; BUSSTOP.g = g;
+    // solid: the parked bus (a row of circles) and the shelter's back wall + posts
+    g.updateMatrixWorld(true); const wp = (x, z) => g.localToWorld(new THREE.Vector3(x, 0, z));
+    BUSSTOP.busCols = [-4, -2, 0, 2, 4, 5.6].map((x) => { const p = wp(x, -4.2); return { x: p.x, z: p.z, r: 1.35, bus: true }; });
+    for (const c of BUSSTOP.busCols) colliders.push(c);
+    for (let x = -2.4; x <= 2.41; x += 0.8) { const p = wp(x, 1.7); colliders.push({ x: p.x, z: p.z, r: 0.45 }); }
+    for (const x of [-2.4, 2.4]) { const p = wp(x, -0.4); colliders.push({ x: p.x, z: p.z, r: 0.25 }); }
+    { const p = wp(3.4, -0.6); colliders.push({ x: p.x, z: p.z, r: 0.25 }); }
+    BUSSTOP.setBusSolid = (on) => { for (const c of BUSSTOP.busCols) { const i = colliders.indexOf(c); if (on && i < 0) colliders.push(c); if (!on && i >= 0) colliders.splice(i, 1); } };
+    // a glowing pad where you stand to board
+    BUSSTOP.ring = add(new THREE.TorusGeometry(2.2, 0.15, 8, 40), mat(0xffffff, { emissive: 0xfacc15, emissiveIntensity: 1.2 }), 0, 0.12, -1.6, g, false); BUSSTOP.ring.rotation.x = Math.PI / 2;
+  }
+  window.__busStop = BUSSTOP;   // handy for debugging
+  let busNear = false, busLeaving = false;
+  const busPrompt = document.createElement('div'); busPrompt.id = 'busPrompt'; busPrompt.className = 'hidden';
+  busPrompt.style.cssText = 'position:fixed;left:50%;bottom:140px;transform:translateX(-50%);background:#3b0764ee;color:#ffd84a;padding:10px 18px;border-radius:14px;font:600 15px system-ui;z-index:20;cursor:pointer;box-shadow:0 8px 24px #0005';
+  document.body.appendChild(busPrompt);
+  const busPromptShow = (on) => { busPrompt.style.display = on ? 'block' : 'none'; };
+  busPromptShow(false);
+  function rideToFactory() {
+    if (busLeaving) return; busLeaving = true; busPromptShow(false); toast('All aboard! Next stop: the Zungga Chocolate Factory 🍫'); blip(660); setTimeout(() => blip(880), 160);
+    const t0 = performance.now();
+    BUSSTOP.setBusSolid(false);
+    (function drive() { const k = (performance.now() - t0) / 1600; BUSSTOP.bus.position.x = -k * k * 12; if (k < 1) requestAnimationFrame(drive); })();
+    setTimeout(() => { $('#fade').classList.add('on'); }, 900);
+    setTimeout(() => { const back = location.pathname + '?play&from=factory'; location.href = FACTORY_URL + '?from=island&back=' + encodeURIComponent(back); }, 1500);
+  }
+  busPrompt.addEventListener('click', rideToFactory);
+  addEventListener('keydown', (e) => { if (started && busNear && (e.code === 'Enter' || e.code === 'KeyE') && !panelOpen && !garageOpen) { e.preventDefault(); rideToFactory(); } });
+  (function busLoop() {
+    requestAnimationFrame(busLoop);
+    if (!started || underground) { if (busNear) { busNear = false; busPromptShow(false); } return; }
+    const lp = BUSSTOP.g.localToWorld(new THREE.Vector3(0, 0, -1.6)), d = Math.hypot(S.x - lp.x, S.z - lp.z), near = d < 4.5 && !busLeaving;
+    BUSSTOP.ring.material.emissiveIntensity = (near ? 2 : 0.8) + Math.sin(performance.now() / 300) * 0.4;
+    if (near !== busNear) { busNear = near; busPrompt.textContent = isTouch ? '🚌 Tap to ride the school bus to the Zungga Chocolate Factory' : '🚌 Press Enter to ride the school bus to the Zungga Chocolate Factory'; busPromptShow(near); }
+  })();
+  // back from the factory (?from=factory): step off the bus at the stop
+  if (/[?&]from=factory\b/.test(location.search)) {
+    const arrive = () => { if (!started) return setTimeout(arrive, 200); const lp = BUSSTOP.g.localToWorld(new THREE.Vector3(1.5, 0, 0.2)); S.x = lp.x; S.z = lp.z; S.h = Math.atan2(-lp.x, -lp.z); S.speed = 0; S.vx = S.vz = 0; snapCamera(); toast('Welcome back from the Zungga Chocolate Factory! 🍫');
+      BUSSTOP.setBusSolid(false); const t0 = performance.now(); (function leave() { const k = (performance.now() - t0) / 4000; BUSSTOP.bus.position.x = k * k * 30; if (k < 1) requestAnimationFrame(leave); else { BUSSTOP.bus.position.x = 0; BUSSTOP.setBusSolid(true); } })(); };
+    setTimeout(arrive, 300);
+  }
+
   window.__game = { get beach() { return { vol: BEACH.vol, playing: !!(BEACH.el && !BEACH.el.paused) }; },  toggleUmbrella, get umbrellaOn() { return umbrellaOn; }, get thrown() { return thrown; },  SPORT, get ACT() { return ACT; }, get JOB() { return JOB; }, startJob, fb, bb, get nearAct() { return nearAct; }, toggleKite, spinTop, get kite() { return kite; }, setPet, startRace, cycleLights, get race() { return race; }, get pet() { return pet; }, runners, get lightMode() { return lightMode; }, get voices() { return voicePool.map(v => v.name + ' ' + v.lang); }, bots, benches, LIFE, hurt, openBag, openNearShop, setPose, get nearShop() { return nearShop; }, S, keys, zones, exhibits, setSeason, cycleWeather, W, get season() { return SEASONS[seasonIdx].key; }, start: () => $('#btn-start').click(), enterCave, leaveCave, skipTime, setCar, CAVE, DN, get underground() { return underground; } }; // handy for debugging
 }, 30);
