@@ -77,31 +77,31 @@
 <div id="panel"></div>
 <div id="noteBox"><b>Note at this spot</b><p style="margin:4px 0 8px;color:#6b6480;font-size:13px" id="noteWhere"></p><textarea id="noteText" placeholder="e.g. this wall is missing, make the vat bigger…"></textarea><div class="btns"><button id="noteSave">Save note</button><button class="ghost" id="noteCancel">Cancel</button></div></div>
 
-<script src="../vendor/three.min.js?v=mvetepy8"></script>
-<script src="assets/core.js?v=mvetepy8"></script>
-<script src="assets/money.js?v=mvetepy8"></script><script src="assets/food.js?v=mvetepy8"></script><script src="assets/toys.js?v=mvetepy8"></script><script src="assets/school.js?v=mvetepy8"></script>
-<script src="assets/furniture.js?v=mvetepy8"></script><script src="assets/shop.js?v=mvetepy8"></script><script src="assets/brand.js?v=mvetepy8"></script><script src="assets/nature.js?v=mvetepy8"></script>
-<script src="assets/sets.js?v=mvetepy8"></script><script src="assets/bank.js?v=mvetepy8"></script><script src="assets/home.js?v=mvetepy8"></script><script src="assets/transport.js?v=mvetepy8"></script>
-<script src="assets/tech.js?v=mvetepy8"></script><script src="assets/street.js?v=mvetepy8"></script><script src="assets/village.js?v=mvetepy8"></script><script src="assets/outdoors.js?v=mvetepy8"></script>
-<script src="assets/islanders.js?v=mvetepy8"></script>
-<script src="assets/animals.js?v=mvetepy8"></script><script src="assets/garage.js?v=mvetepy8"></script><script src="assets/sports.js?v=mvetepy8"></script><script src="assets/sky.js?v=mvetepy8"></script>
-<script src="assets/seasons.js?v=mvetepy8"></script><script src="assets/cave.js?v=mvetepy8"></script>
-<script src="characters/toons.js?v=mvetepy8"></script>
-<script src="characters/explorers.js?v=mvetepy8"></script>
-<script src="characters/creatures.js?v=mvetepy8"></script>
-<script src="js/world-kit.js?v=mvetepy8"></script>
-<script src="js/walker.js?v=mvetepy8"></script>
-<script src="js/world-audio.js?v=mvetepy8"></script>
-<script src="worlds/chocolate-factory/layout.js?v=mvetepy8"></script>
-<script src="worlds/chocolate-factory/living.js?v=mvetepy8"></script>
-<script src="worlds/chocolate-factory/dress-ground.js?v=mvetepy8"></script>
-<script src="worlds/chocolate-factory/dress-first.js?v=mvetepy8"></script>
-<script src="worlds/chocolate-factory/dress-under.js?v=mvetepy8"></script>
-<script src="worlds/chocolate-factory/people.js?v=mvetepy8"></script>
-<script src="worlds/chocolate-factory/ground.js?v=mvetepy8"></script>
-<script src="worlds/chocolate-factory/first.js?v=mvetepy8"></script>
-<script src="worlds/chocolate-factory/under.js?v=mvetepy8"></script>
-<script src="worlds/chocolate-factory/fill.js?v=mvetepy8"></script>
+<script src="../vendor/three.min.js?v=mvf0htnh"></script>
+<script src="assets/core.js?v=mvf0htnh"></script>
+<script src="assets/money.js?v=mvf0htnh"></script><script src="assets/food.js?v=mvf0htnh"></script><script src="assets/toys.js?v=mvf0htnh"></script><script src="assets/school.js?v=mvf0htnh"></script>
+<script src="assets/furniture.js?v=mvf0htnh"></script><script src="assets/shop.js?v=mvf0htnh"></script><script src="assets/brand.js?v=mvf0htnh"></script><script src="assets/nature.js?v=mvf0htnh"></script>
+<script src="assets/sets.js?v=mvf0htnh"></script><script src="assets/bank.js?v=mvf0htnh"></script><script src="assets/home.js?v=mvf0htnh"></script><script src="assets/transport.js?v=mvf0htnh"></script>
+<script src="assets/tech.js?v=mvf0htnh"></script><script src="assets/street.js?v=mvf0htnh"></script><script src="assets/village.js?v=mvf0htnh"></script><script src="assets/outdoors.js?v=mvf0htnh"></script>
+<script src="assets/islanders.js?v=mvf0htnh"></script>
+<script src="assets/animals.js?v=mvf0htnh"></script><script src="assets/garage.js?v=mvf0htnh"></script><script src="assets/sports.js?v=mvf0htnh"></script><script src="assets/sky.js?v=mvf0htnh"></script>
+<script src="assets/seasons.js?v=mvf0htnh"></script><script src="assets/cave.js?v=mvf0htnh"></script>
+<script src="characters/toons.js?v=mvf0htnh"></script>
+<script src="characters/explorers.js?v=mvf0htnh"></script>
+<script src="characters/creatures.js?v=mvf0htnh"></script>
+<script src="js/world-kit.js?v=mvf0htnh"></script>
+<script src="js/walker.js?v=mvf0htnh"></script>
+<script src="js/world-audio.js?v=mvf0htnh"></script>
+<script src="worlds/chocolate-factory/layout.js?v=mvf0htnh"></script>
+<script src="worlds/chocolate-factory/living.js?v=mvf0htnh"></script>
+<script src="worlds/chocolate-factory/dress-ground.js?v=mvf0htnh"></script>
+<script src="worlds/chocolate-factory/dress-first.js?v=mvf0htnh"></script>
+<script src="worlds/chocolate-factory/dress-under.js?v=mvf0htnh"></script>
+<script src="worlds/chocolate-factory/people.js?v=mvf0htnh"></script>
+<script src="worlds/chocolate-factory/ground.js?v=mvf0htnh"></script>
+<script src="worlds/chocolate-factory/first.js?v=mvf0htnh"></script>
+<script src="worlds/chocolate-factory/under.js?v=mvf0htnh"></script>
+<script src="worlds/chocolate-factory/fill.js?v=mvf0htnh"></script>
 <script>
 (async () => {
   'use strict';
@@ -176,8 +176,6 @@
   }
   const windowMats = [];   // the glowing window panes (brighter at night)
   scene.fog = new T.Fog(0xcfe8ff, 110, 620);   // a soft haze: the far side of the compound melts into the mist
-  // distant hills
-  for (let i = 0; i < 18; i++) { const a = i / 18 * Math.PI * 2, r = 330 + (i % 3) * 45, hill = new T.Mesh(new T.SphereGeometry(55 + (i % 4) * 16, 18, 10, 0, Math.PI * 2, 0, Math.PI / 2), new T.MeshStandardMaterial({ color: [0x7fb85a, 0x6aa84f, 0x8cc063][i % 3], roughness: 1 })); hill.position.set(Math.sin(a) * r, -2, Math.cos(a) * r); hill.scale.y = 0.55; scene.add(hill); }
 
   // ---------- the world ----------
   const t0 = performance.now();
