@@ -4206,7 +4206,9 @@ setTimeout(() => { // a beat later, so the loader can paint before the world is 
     const fx = Math.sin(S.h), fz = Math.cos(S.h);
     camPos.set(S.x - fx * 8, S.y + 3.6, S.z - fz * 8); look.set(S.x + fx * 4, S.y + 1.2, S.z + fz * 4);
   }
+  let camCine = null;   // the school-bus flight takes the camera for a moment: () => { pos, look }
   function updateCamera(dt) {
+    if (camCine) { const c = camCine(dt), k = 1 - Math.exp(-3.2 * dt); camPos.lerp(c.pos, k); look.lerp(c.look, k); camera.position.copy(camPos); camera.lookAt(look); return; }
     const fx = Math.sin(S.h), fz = Math.cos(S.h);
     const desired = new THREE.Vector3(), target = new THREE.Vector3(S.x, 1, S.z);
     if (!started) { // slow orbit on the intro screen
@@ -4361,14 +4363,33 @@ setTimeout(() => { // a beat later, so the loader can paint before the world is 
   document.body.appendChild(busPrompt);
   const busPromptShow = (on) => { busPrompt.style.display = on ? 'block' : 'none'; };
   busPromptShow(false);
+  // the sky-high school bus: it takes off from the stop (to the factory) and lands here again (back from the factory)
+  const busTrail = (() => { const n = 70, g2 = new THREE.BufferGeometry(); g2.setAttribute('position', new THREE.BufferAttribute(new Float32Array(n * 3).fill(-9999), 3)); const pts = new THREE.Points(g2, new THREE.PointsMaterial({ color: 0xffe08a, size: 0.4, transparent: true, opacity: 0.85, depthWrite: false, blending: THREE.AdditiveBlending })); pts.frustumCulled = false; scene.add(pts); pts.userData.i = 0; return pts; })();
+  function puffTrail(dt) { const a = busTrail.geometry.attributes.position, tp = a.array, n = tp.length / 3; for (let k = 0; k < n; k++) tp[k * 3 + 1] -= dt * 0.5; const k = busTrail.userData.i = (busTrail.userData.i + 1) % n, w = BUSSTOP.bus.localToWorld(new THREE.Vector3(-4.9, 1.4, 0)); tp[k * 3] = w.x + rand(-0.8, 0.8); tp[k * 3 + 1] = w.y + rand(-0.6, 0.6); tp[k * 3 + 2] = w.z + rand(-0.8, 0.8); a.needsUpdate = true; }
+  const BUS0 = BUSSTOP.bus.position.clone(), busW = (x, y, z) => BUSSTOP.g.localToWorld(new THREE.Vector3(x, y, z));
+  const busSkip = document.createElement('div'); busSkip.textContent = 'Press Esc to skip ⏭'; busSkip.style.cssText = 'position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#140c28aa;color:#fde68a;padding:8px 16px;border-radius:999px;font:600 14px system-ui;z-index:21;display:none'; document.body.appendChild(busSkip);
+  let busSkipNow = false; addEventListener('keydown', (e) => { if (e.code === 'Escape' && busSkip.style.display === 'block') { busSkipNow = true; e.preventDefault(); } });
+  function busFly(T, path, cam, done) {   // path(u) → [x, y, z, pitch, yaw] in the stop's frame; cam(u) → { pos, look } in world
+    const t0 = performance.now(); let last = t0; busSkip.style.display = 'block'; busSkipNow = false; const out = { pos: new THREE.Vector3(), look: new THREE.Vector3() };
+    camCine = () => out;
+    (function step(now) {
+      const dt = Math.min(0.05, (now - last) / 1000); last = now; let u = (now - t0) / 1000 / T; if (busSkipNow) u = 1;
+      const [x, y, z, pitch, yaw] = path(Math.min(1, u)); BUSSTOP.bus.position.set(x, y, z); BUSSTOP.bus.rotation.set(0, yaw || 0, pitch || 0); puffTrail(y > 0.3 ? dt : 0);
+      const c = cam(Math.min(1, u)); out.pos.copy(c.pos); out.look.copy(c.look); S.speed = 0; S.vx = S.vz = 0;
+      if (u < 1) requestAnimationFrame(step); else { busSkip.style.display = 'none'; done(); }
+    })(t0);
+  }
   function rideToFactory() {
     if (busLeaving) return; busLeaving = true; busPromptShow(false); toast('All aboard! Next stop: the Zungga Chocolate Factory 🍫'); blip(660); setTimeout(() => blip(880), 160);
-    const t0 = performance.now();
-    BUSSTOP.setBusSolid(false);
-    (function drive() { const k = (performance.now() - t0) / 1600; BUSSTOP.bus.position.x = -k * k * 12; if (k < 1) requestAnimationFrame(drive); })();
-    setTimeout(() => { $('#fade').classList.add('on'); }, 900);
-    setTimeout(() => { const back = location.pathname + '?play&from=factory'; location.href = FACTORY_URL + '?from=island&back=' + encodeURIComponent(back); }, 1500);
+    BUSSTOP.setBusSolid(false); model.visible = false;
+    const go = () => { const back = location.pathname + '?play&from=factory'; location.href = FACTORY_URL + '?from=island&back=' + encodeURIComponent(back); };
+    let faded = false;
+    busFly(9, (u) => {   // roll forward, lift off, climb away into the sky in a gentle curve
+      const r = Math.min(1, u / 0.18), x = BUS0.x + (u < 0.18 ? r * r * 4 : 4 + Math.pow((u - 0.18) / 0.82, 1.6) * 230), y = u < 0.16 ? 0 : Math.pow((u - 0.16) / 0.84, 1.8) * 120, z = BUS0.z - Math.pow(Math.max(0, u - 0.3) / 0.7, 2) * 60;
+      return [x, y, z, u < 0.16 ? 0 : Math.min(0.32, (u - 0.16) * 1.6), -Math.min(0.35, Math.max(0, u - 0.3))];
+    }, (u) => { const b = BUSSTOP.bus.getWorldPosition(new THREE.Vector3()); if (u > 0.82 && !faded) { faded = true; $('#fade').classList.add('on'); } return { pos: busW(-9, 3 + u * 12, -13 - u * 3), look: b.add(new THREE.Vector3(0, 1.2, 0)) }; }, go);
   }
+  BUSSTOP.ride = rideToFactory;
   busPrompt.addEventListener('click', rideToFactory);
   addEventListener('keydown', (e) => { if (started && busNear && (e.code === 'Enter' || e.code === 'KeyE') && !panelOpen && !garageOpen) { e.preventDefault(); rideToFactory(); } });
   (function busLoop() {
@@ -4380,8 +4401,17 @@ setTimeout(() => { // a beat later, so the loader can paint before the world is 
   })();
   // back from the factory (?from=factory): step off the bus at the stop
   if (/[?&]from=factory\b/.test(location.search)) {
-    const arrive = () => { if (!started) return setTimeout(arrive, 200); const lp = BUSSTOP.g.localToWorld(new THREE.Vector3(1.5, 0, 0.2)); S.x = lp.x; S.z = lp.z; S.h = Math.atan2(-lp.x, -lp.z); S.speed = 0; S.vx = S.vz = 0; snapCamera(); toast('Welcome back from the Zungga Chocolate Factory! 🍫');
-      BUSSTOP.setBusSolid(false); const t0 = performance.now(); (function leave() { const k = (performance.now() - t0) / 4000; BUSSTOP.bus.position.x = k * k * 30; if (k < 1) requestAnimationFrame(leave); else { BUSSTOP.bus.position.x = 0; BUSSTOP.setBusSolid(true); } })(); };
+    const arrive = () => { if (!started) return setTimeout(arrive, 200);
+      const lp = BUSSTOP.g.localToWorld(new THREE.Vector3(7, 0, -1.8)); S.x = lp.x; S.z = lp.z; S.h = Math.atan2(-lp.x, -lp.z); S.speed = 0; S.vx = S.vz = 0; snapCamera();   // beside the bus's nose, clear of the shelter
+      BUSSTOP.setBusSolid(false); model.visible = false; busLeaving = true;
+      busFly(10, (u) => {   // down out of the sky, a wide gentle descent, touching down and rolling slowly to the stop
+        const e = 1 - Math.pow(1 - u, 2.4), x = BUS0.x - 260 * (1 - e), y = u > 0.86 ? 0 : 95 * Math.pow(1 - Math.min(1, u / 0.86), 1.7), z = BUS0.z + 70 * Math.pow(1 - e, 1.5);
+        return [x, y, z, -Math.min(0.22, 0.32 * (1 - u)) * (u < 0.85 ? 1 : 0), Math.min(0.3, 0.3 * (1 - e) * 2)];
+      }, (u) => { const b = BUSSTOP.bus.getWorldPosition(new THREE.Vector3()); return { pos: busW(9, 3.2 + (1 - u) * 5, -13), look: b.add(new THREE.Vector3(0, 1.2, 0)) }; }, () => {
+        BUSSTOP.bus.position.copy(BUS0); BUSSTOP.bus.rotation.set(0, 0, 0); BUSSTOP.setBusSolid(true); model.visible = true; camCine = null; snapCamera(); busLeaving = false;
+        toast('Welcome back from the Zungga Chocolate Factory! 🍫'); blip(880);
+      });
+    };
     setTimeout(arrive, 300);
   }
 
